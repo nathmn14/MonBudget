@@ -1,0 +1,103 @@
+#: import dp kivy.metrics.dp
+
+# CRÉATION D'UNE CLASSE 'Header' POUR AVOIR UN MODELE D'EN-ÊTES PRÉDÉFINI
+<Header@MDBoxLayout>:
+    orientation: "vertical"
+    size_hint_y: None
+    height: dp(100)
+    padding: [dp(16), dp(32), dp(16), dp(8)]
+    md_bg_color: 1, 1, 1, 1
+
+    title: ""
+    subtitle: ""
+
+    MDLabel:
+        text: root.title
+        font_style: "H4"
+        theme_text_color: "Primary"
+
+    MDLabel:
+        text: root.subtitle
+        font_style: "Subtitle2"
+        theme_text_color: "Secondary"
+
+
+#==============================================================================================================
+#VOICI LE TEMPLATE DE CHACUNES DES PAGES DE MON APP
+<AppScreen>:
+
+    MDBottomNavigation:
+        panel_color: 1, 1, 1, 1
+        panel_color: 1, 1, 1, 1  # Fond blanc pur
+        selected_color_indicator: 0.1, 0.5, 0.8, 0.1  # Petite lueur derrière l'icône active
+        text_color_active: 0.1, 0.5, 0.8, 1  # Couleur du texte/icône sélectionné
+        text_color_normal: 0.5, 0.5, 0.5, 1  # Couleur plus douce pour les inactifs
+        use_text: True  # Garder le texte ou pas selon ton envie
+
+
+        # ================= TAB 1 =================
+        MDBottomNavigationItem:
+            name: 'dash'
+            text: 'Dashboard'
+            icon: 'home-analytics'
+            md_bg_color: 0.95, 0.95, 0.95, 1
+            font_size: "10sp"
+
+            MDBoxLayout:
+                orientation: "vertical"
+
+                Header:
+                    title: "Dashboard"
+                    subtitle: "Vue générale"
+
+                MDScrollView:
+                    do_scroll_x: False
+                    MDBoxLayout:
+                        orientation : "vertical"
+                        adaptive_height: True
+                        padding: dp(16)
+                        spacing: dp(12)
+
+
+
+        # ================= TAB 2 =================
+        MDBottomNavigationItem:
+            name: 'transac'
+            text: 'Transaction'
+            icon: 'bank-transfer'
+            md_bg_color: 0.9, 0.9, 0.9, 1
+            font_size: "10sp"
+
+            #TransacScreen :
+            TransacScreen_Manager :
+                id: transac_sm
+
+
+
+        # ================= TAB 3 =================
+        MDBottomNavigationItem:
+            name: 'budg'
+            text: 'Budget'
+            icon: 'wallet'
+            md_bg_color: 0.95, 0.95, 0.95, 1
+            font_size: "10sp"
+
+            BudgetScreen :
+        # ================= TAB 4 =================
+        MDBottomNavigationItem:
+            name: 'categ'
+            text: 'Catégories'
+            icon: 'folder-multiple-outline'
+            md_bg_color: 0.9, 0.9, 0.9, 1
+            font_size: "10sp"
+
+            CategorieScreen :
+
+        # ================= TAB 5 =================
+        MDBottomNavigationItem:
+            name: 'param'
+            text: 'Paramètres'
+            icon: 'cog-outline'
+            font_size: "10sp"
+
+            #ParametreScreen

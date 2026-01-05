@@ -1,0 +1,156 @@
+<BudgetScreen>:
+    name: root.titre_page
+    titre: "Mon Budget"
+    sous_titre: "Analyse des dépenses"
+
+    orientation : "vertical"
+
+    Header:
+        title: "Mon budget"
+        subtitle: "Analyse des dépenses mensuelles"
+
+    MDScrollView:
+        do_scroll_x : False
+
+        # Conteneur des cartes à l'intérieur du ScrollView
+        MDBoxLayout:        # Ce MDBoxLayout contient toutes les cartes de notre structure scrollable.
+            orientation: "vertical"
+            #size_hint_y: None       # CRITIQUE pour les ScrollView : Le conteneur doit avoir une hauteurnon proportionnelle pour que le ScrollView puisse la calculer.
+            #height: self.minimum_height         # CRITIQUE : La hauteur est ajustée automatiquement pour correspondre à la somme minimale de la hauteur de tous ses enfants (cartes).
+            adaptive_height: True
+            padding: dp(16)         # Espace de 16 dp tout autour du contenu.
+            spacing: dp(16)         # Espace de 16 dp entre chaque élément enfant (entre les cartes).
+
+            # --- CARTE PRINCIPALE : Suivi du budget ---
+            MDCard:         # Un conteneur qui affiche un élément Material Design élevé (avec ombre).
+                size_hint: 1, None      # Prend 100% de la largeur (1) et une hauteur fixe (None).
+                height: dp(280)         # Hauteur fixe de la carte principale.
+                padding: dp(16)         # Espace intérieur dans la carte.
+                orientation: "vertical" # Les éléments à l'intérieur de la carte sont empilés verticalement.
+                radius: [12]            # Définit le rayon des coins arrondis à 12 dp.
+                elevation: 0.5          # Niveau d'ombre de la carte.
+                md_bg_color: 1, 1, 1, 1 # colore toute notre carte en blanc
+
+                # Le MDLabel "Budget mensuel"
+                MDLabel:
+                    text: "Budget mensuel"
+                    #size_hint_y: None
+                    #height: self.texture_size[1]
+                    #text_size: self.width, None
+
+                # Le MDLabel du montant (50 000 FC)
+                MDLabel:
+                    text: f"{root.budget_total:,.0f} FC"
+                    font_style: "H4"
+                    #size_hint_y: None
+                    #height: self.texture_size[1]
+                    #text_size: self.width, None
+
+                # Montant utilisé (Aligné à gauche) et Pourcentage
+                MDBoxLayout:
+                    #orientation: "horizontal"
+                    size_hint_y: None
+                    height: dp(30)
+
+                    MDLabel:
+                        text: "Montant utilisé"
+
+                    MDLabel:
+                        text: f"{root.montant_utilise} FC"
+                        halign: "right"
+                        theme_text_color: "Custom"
+                        text_color: 0.9, 0.22, 0.21, 1
+
+                    # Une barre de progression standard de Material Design.
+                MDProgressBar:
+                    value: root.pourcentage_utilise
+                    color: app.theme_cls.primary_color
+                    #size_hint_y: None
+                    height: dp(5)
+                    radius: [2]
+
+                # Le pourcentage du budget utilisé
+                MDLabel:
+                    text: f"{root.pourcentage_utilise}% du budget"
+                    font_style: "Caption"
+                    #size_hint_y: None
+                    #height: self.texture_size[1]
+                    #text_size: self.width, None
+
+                # Le montant restant (restant gauche/ montant droite)
+                MDBoxLayout:
+                    #orientation: "horizontal"
+                    size_hint_y: None
+                    height: dp(40)
+                    #padding: [0, dp(8), 0, dp(8)]
+
+                    MDLabel:
+                        text: "Restant"
+                    MDLabel:
+                        text: f"{root.montant_restant}"
+                        halign: "right"
+                        theme_text_color: "Custom"
+                        text_color: app.theme_cls.primary_color
+                        font_style: "Subtitle2"
+
+                # Bouton "Modifier le budget"
+                MDFillRoundFlatIconButton:
+
+                    text: "Modifier le budget"
+                    icon : "note-edit-outline"
+
+                    size_hint_x: 1
+                    #radius: [2, 2, 2, 2]
+                    height: dp(48)
+                    #icon_size: "24dp"
+
+                    md_bg_color: app.theme_cls.primary_color
+                    text_color: 1, 1, 1, 1
+                    elevation : 0.5
+
+                    on_release: root.modifier_budget()
+
+
+            # --- STATISTIQUES SECONDAIRES côte à côte ---
+            MDGridLayout:
+                cols: 2
+                spacing: dp(12)
+                adaptive_height: True
+
+                MDCard:
+                    padding: dp(12)
+                    size_hint: 1, None
+                    height: dp(100)
+                    elevation: 1
+
+                    MDBoxLayout:
+                        orientation: "vertical"
+
+                        MDLabel:
+                            text: "Dépenses journalières"
+                            font_style: "Caption"
+                            #font_size: dp(15)
+
+                        MDLabel:
+                            text: f"{root.depenses_journalieres} FC / jour"
+                            font_style: "H6"
+                            #theme_text_color: "Custom"
+                            #text_color: 0.2, 0.2, 0.2, 1
+
+                # Seconde carte de statistique : Jours restants
+                MDCard:
+                    padding: dp(12)
+                    size_hint: 1, None
+                    height: dp(100)
+                    elevation: 1
+                    MDBoxLayout:
+                        orientation: "vertical"
+                        MDLabel:
+                            text: "Jours restants"
+                            font_style : "Caption"
+
+                        MDLabel:
+                            text: str(root.jours_restants) + " jours"
+                            font_style: "H6"
+                            #theme_text_color: "Custom"
+                            #text_color: 0.2, 0.2, 0.2, 1
