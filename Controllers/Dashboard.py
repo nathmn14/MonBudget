@@ -14,6 +14,7 @@ class ItemCategorie(MDBoxLayout):
     icone = StringProperty("")
     couleur_icone = ColorProperty([0, 0, 0, 1])
 
+
 class SectionDepensesCategorie(MDBoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

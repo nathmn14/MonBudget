@@ -12,6 +12,7 @@ from Controllers.Transaction import TransacScreen
 from Controllers.Dashboard import DashboardScreen
 
 
+
 #--- CONFIGUER LA TAILLE DE L'ÉCRAN (MOBILE)---
 #Window.size = (360, 640)
 Window.size = (288, 640)
