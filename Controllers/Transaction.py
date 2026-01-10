@@ -41,7 +41,6 @@ from Controllers.Categorie import Categorie_Card
 #    Lien KV : Référence le bloc <TransacScreen_Manager@MDScreenManager> dans le fichier .kv.
 # ============================================================================================================
 class TransacScreen_Manager(MDScreenManager):
-
     pass
 
 
@@ -190,6 +189,7 @@ class TransacScreen(MDScreen):
             conteneur_transaction.add_widget(transaction)
 
 
+
     # --- GESTIONS DES FILTRES (barre de recherche, categorie, mois) ---
     def filtrer_transaction(self):
         """
@@ -329,6 +329,7 @@ class TransacAddScreen(MDScreen):
         """
         liste = list(Categorie_Card.dictionnaire_cat.keys())
         declencheur = self.ids.menu_categories2
+
         Items = []
         for i in liste:
             Items.append({
@@ -398,8 +399,8 @@ class TransacAddScreen(MDScreen):
     # --- FERMER LE DIALOGUE ---
     def fermer_dialogue(self, *args):
         # On ferme la boite de dialogue puis on la vide
-        self.dialog.dismiss()  # Fermer
         self.dialog = None  # Vider
+        self.dialog.dismiss()  # Fermer
 
 
     # --- DÉCLENCHEMENT DE L'AJOUT ---

@@ -224,6 +224,7 @@
                     MDLabel:
                         id: nb_transaction
                         text: ""
+
                         adaptive_height: True
                         theme_text_color: "Secondary"
                         halign: 'center'
@@ -268,8 +269,8 @@
                 # Fonction lorsqu'on clic
                 on_release:
                     # On cherche le ScreenManager 'transac_sm' défini dans Template.kv
-                    root.manager.transition.direction = 'left'
                     root.manager.current='add_screen'
+                    root.manager.transition.direction = 'left'
 
 
 
