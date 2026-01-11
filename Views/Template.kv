@@ -6,7 +6,7 @@
     size_hint_y: None
     height: dp(100)
     padding: [dp(16), dp(32), dp(16), dp(8)]
-    md_bg_color: 1, 1, 1, 1
+    md_bg_color:  app.custom_colors[app.theme_cls.theme_style]["bg_secondary"]
 
     title: ""
     subtitle: ""
@@ -27,11 +27,10 @@
 <AppScreen>:
 
     MDBottomNavigation:
-        panel_color: 1, 1, 1, 1
-        panel_color: 1, 1, 1, 1  # Fond blanc pur
-        selected_color_indicator: 0.1, 0.5, 0.8, 0.1  # Petite lueur derrière l'icône active
-        text_color_active: 0.1, 0.5, 0.8, 1  # Couleur du texte/icône sélectionné
-        text_color_normal: 0.5, 0.5, 0.5, 1  # Couleur plus douce pour les inactifs
+        panel_color:  app.custom_colors[app.theme_cls.theme_style]["bg_primary"]
+        selected_color_indicator: 0.8, 0.5, 0.8, 0.1                                   # Petite lueur derrière l'icône active
+        text_color_active:  app.custom_colors[app.theme_cls.theme_style]["accent"]                                    # Couleur du texte/icône sélectionné
+        text_color_normal:  app.custom_colors[app.theme_cls.theme_style]["bg_primary"]  # Couleur plus douce pour les inactifs
         use_text: True  # Garder le texte ou pas selon ton envie
 
 
@@ -88,4 +87,4 @@
             icon: 'cog-outline'
             font_size: "10sp"
 
-            #ParametreScreen
+            ParametreScreen :
