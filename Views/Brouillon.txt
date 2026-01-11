@@ -1,0 +1,141 @@
+<SettingItem@MDCard>:
+    orientation: 'horizontal'
+    adaptive_height: True
+    padding: [dp(20), dp(15)]
+    spacing: dp(15)
+    #md_bg_color: 1, 1, 1, 1 # Fond blanc pour les items
+
+    MDIcon:
+        icon: root.icon
+        theme_text_color: "Custom"
+        text_color: root.icon_color
+        pos_hint: {"center_y": .5}
+        font_size: "24sp"
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        adaptive_height: True
+        pos_hint: {"center_y": .5}
+
+        MDLabel:
+            text: root.text
+            font_style: "Subtitle1"
+            bold: True
+            theme_text_color: "Primary"
+            adaptive_height: True
+
+        MDLabel:
+            text: root.secondary_text
+            font_style: "Caption"
+            theme_text_color: "Secondary"
+            adaptive_height: True
+
+    MDIcon:
+        icon: root.tertiary_icon
+        theme_text_color: "Secondary"
+        pos_hint: {"center_y": .5}
+        font_size: "20sp"
+
+<ParametreScreen>:
+
+    orientation: 'vertical'
+    md_bg_color: 0.96, 0.96, 0.96, 1 # Gris très clair (#F5F5F5)
+
+    # HEADER
+    MDBoxLayout:
+        orientation: 'vertical'
+        adaptive_height: True
+        padding: [dp(20), dp(30), dp(20), dp(20)]
+        md_bg_color: 1, 1, 1, 1
+
+        MDLabel:
+            text: "Paramètres"
+            font_style: "H5"
+            bold: True
+            theme_text_color: "Primary"
+
+        MDLabel:
+            text: "Configurer l'application"
+            font_style: "Subtitle2"
+            theme_text_color: "Secondary"
+
+    # CORPS SCROLLABLE
+    MDScrollView:
+        do_scroll_x: False
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            adaptive_height: True
+            spacing: dp(1) # Espace minimal entre items
+
+            # SECTION APPARENCE
+            MDLabel:
+                text: "Apparence"
+                bold: True
+                font_style: "Caption"
+                padding: [dp(20), dp(20)]
+
+            SettingItem:
+                text: "Mode sombre"
+                secondary_text: "Désactivé"
+                icon: "weather-sunny"
+                icon_color: 0.5, 0.5, 0.5, 1
+                on_touch_down: if self.collide_point(*args[1].pos): root.on_mode_sombre_click()
+
+            MDSeparator:
+
+            # SECTION EXPORTATION
+            MDLabel:
+                text: "Exportation"
+                bold: True
+                font_style: "Caption"
+                padding: [dp(20), dp(20)]
+
+            SettingItem:
+                text: "Exporter en CSV"
+                secondary_text: "Toutes les transactions"
+                icon: "file-download-outline"
+                icon_color: 0.1, 0.7, 0.3, 1 # Vert
+                tertiary_icon: "chevron-right"
+                on_touch_down: if self.collide_point(*args[1].pos): root.on_export_csv()
+
+            SettingItem:
+                text: "Exporter en JSON"
+                secondary_text: "Données complètes"
+                icon: "file-code-outline"
+                icon_color: 0.1, 0.4, 0.8, 1 # Bleu
+                tertiary_icon: "chevron-right"
+                on_touch_down: if self.collide_point(*args[1].pos): root.on_export_json()
+
+            MDSeparator:
+
+            # SECTION À PROPOS
+            MDLabel:
+                text: "À propos"
+                bold: True
+                font_style: "Caption"
+                padding: [dp(20), dp(20)]
+
+            SettingItem:
+                text: "MonBudget"
+                secondary_text: "Application de gestion de budget"
+                icon: "information-outline"
+                icon_color: 0.1, 0.4, 0.8, 1 # Bleu
+
+            # VERSION ITEM
+            MDBoxLayout:
+                orientation: 'horizontal'
+                adaptive_height: True
+                padding: [dp(20), dp(15)]
+                md_bg_color: 1, 1, 1, 1
+
+                MDLabel:
+                    text: "Version"
+                    theme_text_color: "Primary"
+
+                MDLabel:
+                    text: "1.0.0"
+                    halign: "right"
+                    bold: True
+                    theme_text_color: "Primary"
+
