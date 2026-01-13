@@ -70,6 +70,12 @@ class MainApp(MDApp):
 
         return sm
 
+    def notify(self, message, type="info"):
+        """Fonction universelle appelable partout"""
+        # On récupère l'instance du template
+        screen = self.root.get_screen('app_screen')
+        screen.notifier(message, type)
+
 
 if __name__ == "__main__":
 

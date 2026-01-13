@@ -247,3 +247,35 @@
 
                             GraphiqueBarres:
                                 id: graph_barres
+
+
+
+            MDFloatingActionButton:
+                # 1. Icône petite
+                icon: "microphone"
+                icon_size: dp(30)              # Taille de l'image interne
+
+                # 2. Couleurs
+                md_bg_color: 0.2, 0.6, 0.2
+                theme_icon_color: "Custom"
+                icon_color: 1, 1, 1, 1
+
+                # 3. TAILLE RÉDUITE (La clé est ici)
+                type: "standard"                  # On passe en 'small' au lieu de 'large'
+                size_hint: None, None
+                size: dp(45), dp(45)           # Taille du cercle (ne descends pas trop bas pour le tactile)
+                #radius: [dp(12)]              # Garde l'aspect arrondi/carré
+
+                # 4. POSITION PROPORTIONNELLE
+                # x: 0.85 place le bouton à 85% de la largeur (à droite)
+                # y: 0.12 le place à 12% de la hauteur (juste au dessus de la barre de navigation)
+                pos_hint: {"center_x": 0.15, "center_y": 0.10}
+
+                #elevation: 3
+                elevation: 0
+                shadow_softness: 0
+                shadow_radius: [0,0,0,0]
+
+
+
+
