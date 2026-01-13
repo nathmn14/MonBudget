@@ -25,73 +25,86 @@
             MDCard:         # Un conteneur qui affiche un élément Material Design élevé (avec ombre).
                 size_hint: 1, None      # Prend 100% de la largeur (1) et une hauteur fixe (None).
                 height: dp(280)         # Hauteur fixe de la carte principale.
-                padding: dp(16)         # Espace intérieur dans la carte.
+                padding: dp(18)         # Espace intérieur dans la carte.
                 orientation: "vertical" # Les éléments à l'intérieur de la carte sont empilés verticalement.
                 radius: [12]            # Définit le rayon des coins arrondis à 12 dp.
                 elevation: 0.5          # Niveau d'ombre de la carte.
-                md_bg_color: 1, 1, 1, 1 # colore toute notre carte en blanc
+                md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_primary"] # colore toute notre carte en blanc
+                spacing: dp(5) #ajoute de l'espace entre les éléments
 
                 # Le MDLabel "Budget mensuel"
                 MDLabel:
                     text: "Budget mensuel"
-                    #size_hint_y: None
-                    #height: self.texture_size[1]
-                    #text_size: self.width, None
 
-                # Le MDLabel du montant (50 000 FC)
-                MDLabel:
-                    text: f"{root.budget_total:,.0f} FC"
-                    font_style: "H4"
-                    #size_hint_y: None
-                    #height: self.texture_size[1]
-                    #text_size: self.width, None
-
-                # Montant utilisé (Aligné à gauche) et Pourcentage
-                MDBoxLayout:
-                    #orientation: "horizontal"
+                Widget: # espace entre titre et montant
                     size_hint_y: None
-                    height: dp(30)
+                    height: dp(6)
 
-                    MDLabel:
-                        text: "Montant utilisé"
+                # Le MDLabel du montant (Budget Total)
+                MDLabel:
+                    text: str(int(root.budget_total)) + " FC"
+                    font_style: "H5"
+                    theme_text_color: "Primary"
 
-                    MDLabel:
-                        text: f"{root.montant_utilise} FC"
-                        halign: "right"
-                        theme_text_color: "Custom"
-                        text_color: 0.9, 0.22, 0.21, 1
-
-                    # Une barre de progression standard de Material Design.
-                MDProgressBar:
-                    value: root.pourcentage_utilise
-                    color: app.theme_cls.primary_color
+                Widget: # pour ajouter l'espace entre le montant et le pourcentage
                     size_hint_y: None
                     height: dp(15)
-                    radius: [5]
 
-                # Le pourcentage du budget utilisé
-                MDLabel:
-                    text: f"{root.pourcentage_utilise}% du budget"
-                    font_style: "Caption"
-                    #size_hint_y: None
-                    #height: self.texture_size[1]
-                    #text_size: self.width, None
-
-                # Le montant restant (restant gauche/ montant droite)
+                # Montant utilisé
                 MDBoxLayout:
-                    #orientation: "horizontal"
                     size_hint_y: None
-                    height: dp(40)
-                    #padding: [0, dp(8), 0, dp(8)]
+                    height: dp(15)
 
                     MDLabel:
-                        text: "Restant"
+                        text: "Dépenses actuelles"
+                        theme_text_color: "Secondary"
+
                     MDLabel:
-                        text: f"{root.montant_restant}"
+                        text: str(int(root.montant_utilise)) + " FC"
                         halign: "right"
                         theme_text_color: "Custom"
-                        text_color: app.theme_cls.primary_color
-                        font_style: "Subtitle2"
+                        text_color: 1, 0.3, 0.3, 1  # Rouge doux
+                
+                Widget: # espace entre dépenses et progress bar
+                    size_hint_y: None
+                    height: dp(10)
+
+                # Barre de progression
+                MDProgressBar:
+                    value: root.pourcentage_utilise
+                    color: app.custom_colors[app.theme_cls.theme_style]["accent"]
+                    size_hint_x: 1
+                    height: dp(4)
+                    radius: [4]
+                    spacing: dp(2)
+
+                # Pourcentage
+                MDLabel:
+                    text: str(root.pourcentage_utilise) + "% consommé"
+                    font_style: "Caption"
+                    theme_text_color: "Secondary"
+
+                Widget:
+                    size_hint_y: None
+                    height: dp(10)
+
+                # Le montant restant (Grosse taille)
+                MDBoxLayout:
+                    size_hint_y: None
+                    height: dp(50)
+
+                    MDLabel:
+                        text: "Reste à dépenser"
+                        font_style: "Subtitle1"
+                        theme_text_color: "Primary"
+                        
+
+                    MDLabel: 
+                        text: str(int(root.montant_restant)) + " FC"
+                        halign: "right"
+                        font_style: "H6"  # Même taille que le budget total
+                        theme_text_color: "Custom"
+                        text_color: 0.1, 0.5, 0.8, 1 #Couleur bleue
 
                 # Bouton "Modifier le budget"
                 MDFillRoundFlatIconButton:
@@ -104,7 +117,7 @@
                     height: dp(48)
                     #icon_size: "24dp"
 
-                    md_bg_color: app.theme_cls.primary_color
+                    md_bg_color: app.custom_colors[app.theme_cls.theme_style]["accent"]
                     text_color: 1, 1, 1, 1
                     elevation : 0.5
 
@@ -121,7 +134,9 @@
                     padding: dp(12)
                     size_hint: 1, None
                     height: dp(100)
-                    elevation: 1
+                    elevation: 0.5
+                    md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_primary"]
+                    
 
                     MDBoxLayout:
                         orientation: "vertical"
@@ -131,18 +146,29 @@
                             font_style: "Caption"
                             #font_size: dp(15)
 
+                        Widget: # espace entre titre et montant
+                            size_hint_y: None
+                            height: dp(6)
+
                         MDLabel:
-                            text: f"{root.depenses_journalieres} FC / jour"
-                            font_style: "H6"
+                            text: str(int(root.depenses_journalieres))
+                            font_style: "H5"
                             #theme_text_color: "Custom"
                             #text_color: 0.2, 0.2, 0.2, 1
+                        
+                        MDLabel:
+                            text: "FC / jour"
+                            font_style : "Caption"
 
                 # Seconde carte de statistique : Jours restants
                 MDCard:
                     padding: dp(12)
                     size_hint: 1, None
                     height: dp(100)
-                    elevation: 1
+                    elevation: 0.5
+                    md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_primary"]
+
+
                     MDBoxLayout:
                         orientation: "vertical"
                         MDLabel:
@@ -150,7 +176,12 @@
                             font_style : "Caption"
 
                         MDLabel:
-                            text: str(root.jours_restants) + " jours"
-                            font_style: "H6"
+                            text: str(root.jours_restants) 
+                            font_style: "H5"
                             #theme_text_color: "Custom"
                             #text_color: 0.2, 0.2, 0.2, 1
+                        
+                        MDLabel:
+                            text: "Jours"
+                            font_style : "Caption"
+                            

@@ -1,7 +1,7 @@
 ####################################################
-# 1. MODELE POUR CHAQUE CATÉGORIE               #
+# 1. LA CLASSE POUR CHAQUE CATÉGORIE               #
 ####################################################
-<Categorie_Card@MDCard>:
+<Categorie_Card>:
     #PROPRIÉTÉS PERSONNALISABLE
     nom : ''
     icon: ''
@@ -10,8 +10,8 @@
     txt_categorie: root.couleur[0],root.couleur[1],root.couleur[2],1
 
     #Propiétés de MDCard
-    md_bg_color: 1, 1, 1, 1
-    radius: [0]
+    md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_primary"]
+    radius: [10]
     size_hint_y: None
     height: dp(56)
 
@@ -36,7 +36,7 @@
         MDLabel:
             text: root.nom
             theme_text_color: "Custom"
-            text_color: 0, 0, 0, 1
+            text_color: app.custom_colors[app.theme_cls.theme_style]["text"]
             font_size: "15dp"   # surcharge fine
             #font_style: "H6"
             pos_hint: {"center_y": .5}
@@ -49,7 +49,7 @@
             icon: "trash-can-outline"
             theme_text_color: "Custom"
             text_color: 1,0.5,0.5,1
-            md_bg_color: 1, 1, 1, 1
+            md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_primary"]
             pos_hint: {"center_y": .5}
             on_release : root.supprimer_categorie()
 
@@ -89,7 +89,7 @@
 #####################################################################
 # 2. LA BOITE DE DIALOGUE POUR AJOUTER UNE NOUVELLE CATÉGORIE       #
 #####################################################################
-<Contenu_Dialog@MDBoxLayout>
+<Contenu_Dialog>
     #Les propriétés pour la structure de notre contenu
     orientation: 'vertical'
     #padding: dp(0)
@@ -101,7 +101,7 @@
     MDTextField:
         id: nom_categorie
         hint_text: 'Nom de la catégorie'
-        mode: 'rectangle'
+        mode: 'line'
 
     # Boite pour mes selecteur (couleur et icon)
     MDBoxLayout:
@@ -191,7 +191,7 @@
         height: dp(48)
         #icon_size: "24dp"
 
-        #md_bg_color: app.theme_cls.primary_color
+        md_bg_color: app.custom_colors[app.theme_cls.theme_style]["accent"]
         text_color: 1, 1, 1, 1
         elevation : 0.5
 
@@ -204,7 +204,7 @@
             orientation : "vertical"
             adaptive_height: True
             padding: dp(12)
-            spacing: dp(12)
+            spacing: dp(8)
             id: box_categories
 
             # Exemples (ces exemples s'affichent seulement si les données ne sont pas gérées dynamiquement )

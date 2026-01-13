@@ -60,72 +60,26 @@
     orientation: 'vertical'
     padding: dp(10)
 
-    # Zone des axes et des barres
+    # Zone des axes et des barres (dessinée dynamiquement en Python)
     MDBoxLayout:
+        id: chart_area
         size_hint_y: 0.8
-        canvas.before:
-            Color:
-                rgba: 0.9, 0.9, 0.9, 1  # Couleur des lignes de grille
-            # Lignes horizontales de repère (0, 15k, 30k, 60k)
-            Line:
-                points: [self.x + dp(30), self.y + dp(20), self.right, self.y + dp(20)]
-            Line:
-                points: [self.x + dp(30), self.y + dp(70), self.right, self.y + dp(70)]
-            Line:
-                points: [self.x + dp(30), self.y + dp(120), self.right, self.y + dp(120)]
 
-
-        # Dessin manuel des barres pour Janvier, Février et Mars
-        Widget:
-            canvas:
-                # JANVIER
-                Color:
-                    rgba: 0.1, 0.7, 0.3, 1 # Vert Revenus
-                Rectangle:
-                    pos: [self.x + dp(40), self.y + dp(20)]
-                    size: [dp(20), dp(100)] # Hauteur simulée
-                Color:
-                    rgba: 1, 0.3, 0.5, 1 # Rose Dépenses
-                Rectangle:
-                    pos: [self.x + dp(65), self.y + dp(20)]
-                    size: [dp(20), dp(40)]
-
-                # FÉVRIER
-                Color:
-                    rgba: 0.1, 0.7, 0.3, 1
-                Rectangle:
-                    pos: [self.x + dp(120), self.y + dp(20)]
-                    size: [dp(20), dp(90)]
-                Color:
-                    rgba: 1, 0.3, 0.5, 1
-                Rectangle:
-                    pos: [self.x + dp(145), self.y + dp(20)]
-                    size: [dp(20), dp(60)]
-
-                # MARS
-                Color:
-                    rgba: 0.1, 0.7, 0.3, 1
-                Rectangle:
-                    pos: [self.x + dp(200), self.y + dp(20)]
-                    size: [dp(20), dp(110)]
-                Color:
-                    rgba: 1, 0.3, 0.5, 1
-                Rectangle:
-                    pos: [self.x + dp(225), self.y + dp(20)]
-                    size: [dp(20), dp(50)]
-
-    # Étiquettes des mois (Jan, Fév, Mar)
+    # Étiquettes des mois (alimentées dynamiquement)
     MDBoxLayout:
         size_hint_y: 0.1
         padding: [dp(40), 0, 0, 0]
         MDLabel:
-            text: "Jan"
+            id: month_lbl_0
+            text: ""
             font_style: "Caption"
         MDLabel:
-            text: "Fév"
+            id: month_lbl_1
+            text: ""
             font_style: "Caption"
         MDLabel:
-            text: "Mar"
+            id: month_lbl_2
+            text: ""
             font_style: "Caption"
 
     # Légende (Revenus / Dépenses)
@@ -211,7 +165,7 @@
                             text: "Solde du mois"
                             halign: "left"
                         MDLabel:
-                            text: "25 000 FC"
+                            text: root.solde_mois
                             font_style: "H4"
                             halign: "left"
                             theme_text_color: "Primary"
@@ -228,7 +182,7 @@
                             radius: dp(15)
                             StatCard:
                                 titre: "Dépenses"
-                                montant: "-18 000"
+                                montant: root.total_depenses
                                 couleur_texte: 1, 0.3, 0.3, 1 # Rose/Rouge
 
                         # Revenus
@@ -237,7 +191,7 @@
                             adaptive_height: True
                             StatCard:
                                 titre: "Revenus"
-                                montant: "+43 000"
+                                montant: root.total_revenus
                                 couleur_texte: 0.1, 0.7, 0.3, 1 # Vert
 
                     # 3. DÉPENSES PAR CATÉGORIE
@@ -257,70 +211,22 @@
                                 text: "Dépenses par catégorie"
                                 adaptive_height: True
 
-                            # Graphique Circulaire (Canvas)
+                            # Graphique Circulaire (Pie Chart)
                             MDBoxLayout:
                                 size_hint: None, None
                                 size: dp(140), dp(140)
                                 pos_hint: {"center_x": .5}
-
-                                canvas:
-                                    Color:
-                                        rgba: 1, 0.4, 0.5, 1
-                                    Ellipse:
-                                        pos: self.pos
-                                        size: self.size
-                                        angle_start: 0
-                                        angle_end: 140
-                                    Color:
-                                        rgba: 0.2, 0.6, 0.9, 1
-                                    Ellipse:
-                                        pos: self.pos
-                                        size: self.size
-                                        angle_start: 140
-                                        angle_end: 230
-                                    Color:
-                                        rgba: 1, 0.8, 0.4, 1
-                                    Ellipse:
-                                        pos: self.pos
-                                        size: self.size
-                                        angle_start: 230
-                                        angle_end: 300
-                                    Color:
-                                        rgba: 0.3, 0.8, 0.7, 1
-                                    Ellipse:
-                                        pos: self.pos
-                                        size: self.size
-                                        angle_start: 300
-                                        angle_end: 360
+                                
+                                PieChart:
+                                    id: chart_pie
+                                    size_hint: 1, 1
 
                             # Liste des items
                             MDBoxLayout:
+                                id: box_categories_stats
                                 orientation: 'vertical'
                                 adaptive_height: True
-
-                                ItemCategorie:
-                                    nom: "Alimentation"
-                                    montant: "8 000 FC"
-                                    icone: "food-apple"
-                                    couleur_icone: 1, 0.4, 0.5, 1
-
-                                ItemCategorie:
-                                    nom: "Transport"
-                                    montant: "5 000 FC"
-                                    icone: "car"
-                                    couleur_icone: 0.2, 0.6, 0.9, 1
-
-                                ItemCategorie:
-                                    nom: "Logement"
-                                    montant: "3 000 FC"
-                                    icone: "home"
-                                    couleur_icone: 1, 0.8, 0.4, 1
-
-                                ItemCategorie:
-                                    nom: "Loisirs"
-                                    montant: "2 000 FC"
-                                    icone: "controller-classic"
-                                    couleur_icone: 0.3, 0.8, 0.7, 1
+                                spacing: dp(5)
 
                     # 4. ZONE GRAPHIQUE : Revenus VS Dépenses
                     MDBoxLayout:
@@ -340,3 +246,4 @@
                                 adaptive_height: True
 
                             GraphiqueBarres:
+                                id: graph_barres

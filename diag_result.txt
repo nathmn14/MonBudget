@@ -1,0 +1,36 @@
+--- CATEGORIES ---
+{'id_categorie': 4, 'nom_categorie': 'Loisirs', 'type_transaction': 'SORTIE'}
+{'id_categorie': 5, 'nom_categorie': 'Courses', 'type_transaction': 'SORTIE'}
+{'id_categorie': 6, 'nom_categorie': 'Telephone', 'type_transaction': 'SORTIE'}
+{'id_categorie': 7, 'nom_categorie': 'Café', 'type_transaction': 'SORTIE'}
+{'id_categorie': 8, 'nom_categorie': 'Cadeaux', 'type_transaction': 'SORTIE'}
+{'id_categorie': 9, 'nom_categorie': 'Cinéma', 'type_transaction': 'SORTIE'}
+{'id_categorie': 10, 'nom_categorie': 'Etudes', 'type_transaction': 'SORTIE'}
+{'id_categorie': 11, 'nom_categorie': 'Santé', 'type_transaction': 'SORTIE'}
+{'id_categorie': 12, 'nom_categorie': 'Business', 'type_transaction': 'SORTIE'}
+{'id_categorie': 13, 'nom_categorie': 'Énergie', 'type_transaction': 'SORTIE'}
+{'id_categorie': 14, 'nom_categorie': 'Éducation', 'type_transaction': 'SORTIE'}
+{'id_categorie': 15, 'nom_categorie': 'Salaire', 'type_transaction': 'ENTREE'}
+{'id_categorie': 16, 'nom_categorie': 'ananas', 'type_transaction': 'SORTIE'}
+{'id_categorie': 17, 'nom_categorie': 'test categorie', 'type_transaction': 'SORTIE'}
+{'id_categorie': 18, 'nom_categorie': 'test transac', 'type_transaction': 'SORTIE'}
+
+--- TRANSACTIONS ---
+Total Transactions: 14
+{'id_transaction': 1, 'id_compte': 1, 'id_categorie': 16, 'montant': 2000.0, 'type_transaction': 'SORTIE', 'description': '', 'date_transaction': '29/12/2025', 'date_creation': '2026-01-10 13:24:27', 'date_modification': '2026-01-10 13:24:27'}
+{'id_transaction': 2, 'id_compte': 1, 'id_categorie': 8, 'montant': 10000.0, 'type_transaction': 'ENTREE', 'description': 'test income revenu', 'date_transaction': '29/12/2025', 'date_creation': '2026-01-10 13:46:31', 'date_modification': '2026-01-10 13:46:31'}
+{'id_transaction': 3, 'id_compte': 1, 'id_categorie': 17, 'montant': 200.0, 'type_transaction': 'SORTIE', 'description': 'test transaction', 'date_transaction': '29/12/2025', 'date_creation': '2026-01-10 13:53:13', 'date_modification': '2026-01-10 13:53:13'}
+{'id_transaction': 4, 'id_compte': 1, 'id_categorie': 17, 'montant': 2000.0, 'type_transaction': 'SORTIE', 'description': 'test transac 2', 'date_transaction': '11/12/2025', 'date_creation': '2026-01-10 14:21:23', 'date_modification': '2026-01-10 14:21:23'}
+{'id_transaction': 5, 'id_compte': 1, 'id_categorie': 18, 'montant': 1000.0, 'type_transaction': 'SORTIE', 'description': 'test_transac', 'date_transaction': '11/12/2025', 'date_creation': '2026-01-10 14:22:52', 'date_modification': '2026-01-10 14:22:52'}
+{'id_transaction': 6, 'id_compte': 1, 'id_categorie': 18, 'montant': 10.0, 'type_transaction': 'SORTIE', 'description': 'test_transac2', 'date_transaction': '11/12/2025', 'date_creation': '2026-01-10 14:23:25', 'date_modification': '2026-01-10 14:23:25'}
+{'id_transaction': 7, 'id_compte': 1, 'id_categorie': 18, 'montant': 10000.0, 'type_transaction': 'SORTIE', 'description': 'test_ajout transaction', 'date_transaction': '29/12/2025', 'date_creation': '2026-01-10 14:34:26', 'date_modification': '2026-01-10 14:34:26'}
+{'id_transaction': 8, 'id_compte': 1, 'id_categorie': 18, 'montant': 1000.0, 'type_transaction': 'SORTIE', 'description': 'test notification', 'date_transaction': '29/12/2025', 'date_creation': '2026-01-10 14:36:10', 'date_modification': '2026-01-10 14:36:10'}
+{'id_transaction': 9, 'id_compte': 1, 'id_categorie': 18, 'montant': 10000.0, 'type_transaction': 'SORTIE', 'description': 'test depense', 'date_transaction': '29/12/2025', 'date_creation': '2026-01-10 14:45:20', 'date_modification': '2026-01-10 14:45:20'}
+{'id_transaction': 10, 'id_compte': 1, 'id_categorie': 8, 'montant': 20000.0, 'type_transaction': 'ENTREE', 'description': 'test cadeau', 'date_transaction': '29/12/2025', 'date_creation': '2026-01-10 14:47:57', 'date_modification': '2026-01-10 14:47:57'}
+{'id_transaction': 11, 'id_compte': 1, 'id_categorie': 17, 'montant': 49000.0, 'type_transaction': 'SORTIE', 'description': 'test_budget', 'date_transaction': '12/11/2025', 'date_creation': '2026-01-10 15:45:36', 'date_modification': '2026-01-10 15:45:36'}
+{'id_transaction': 12, 'id_compte': 1, 'id_categorie': 18, 'montant': 5000.0, 'type_transaction': 'SORTIE', 'description': 'test transac', 'date_transaction': '29/12/2025', 'date_creation': '2026-01-10 16:58:02', 'date_modification': '2026-01-10 16:58:02'}
+{'id_transaction': 13, 'id_compte': 1, 'id_categorie': 16, 'montant': 23000.0, 'type_transaction': 'SORTIE', 'description': 'test ananas', 'date_transaction': '29/12/2025', 'date_creation': '2026-01-10 17:01:04', 'date_modification': '2026-01-10 17:01:04'}
+{'id_transaction': 14, 'id_compte': 1, 'id_categorie': 18, 'montant': 1000.0, 'type_transaction': 'SORTIE', 'description': 'test 1', 'date_transaction': '29/12/2025', 'date_creation': '2026-01-10 17:16:15', 'date_modification': '2026-01-10 17:16:15'}
+
+--- COMPTES ---
+{'id_compte': 1, 'id_utilisateur': 1, 'intitule_compte': 'Mon Compte Principal', 'devise': 'FC', 'type_compte': 'cash', 'date_creation': '2026-01-10 13:17:44', 'date_modification': '2026-01-10 13:17:44'}

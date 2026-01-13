@@ -6,7 +6,7 @@
     size_hint_y: None
     height: dp(100)
     padding: [dp(16), dp(32), dp(16), dp(8)]
-    md_bg_color:  app.custom_colors[app.theme_cls.theme_style]["bg_secondary"]
+    md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_secondary"]
 
     title: ""
     subtitle: ""
@@ -22,15 +22,54 @@
         theme_text_color: "Secondary"
 
 
+# DÉFINITION DE LA NOTIFICATION HAUT D'ÉCRAN
+<TopNotification>:
+    size_hint: 0.9, None
+    height: dp(60)
+    padding: dp(12)
+    spacing: dp(12)
+    radius: [dp(12), dp(12), dp(12), dp(12)]
+    elevation: 4
+    md_bg_color: root.bg_color
+    orientation: "horizontal"
+    # S'assurer que le widget est bien au premier plan
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, 0.2
+        RoundedRectangle:
+            pos: self.x + dp(2), self.y - dp(2)
+            size: self.size
+            radius: [dp(12), dp(12), dp(12), dp(12)]
+
+    MDIcon:
+        icon: root.icon
+        theme_text_color: "Custom"
+        text_color: 1, 1, 1, 1
+        pos_hint: {"center_y": 0.5}
+        font_size: "24sp"
+
+    MDLabel:
+        text: root.text
+        theme_text_color: "Custom"
+        text_color: 1, 1, 1, 1
+        bold: True
+        font_style: "Caption"
+        pos_hint: {"center_y": 0.5}
+
+
 #==============================================================================================================
 #VOICI LE TEMPLATE DE CHACUNES DES PAGES DE MON APP
 <AppScreen>:
 
+    # La notification flottante (au dessus de tout)
+    # Déplacée à la fin pour être au-dessus
+
     MDBottomNavigation:
-        panel_color:  app.custom_colors[app.theme_cls.theme_style]["bg_primary"]
-        selected_color_indicator: 0.8, 0.5, 0.8, 0.1                                   # Petite lueur derrière l'icône active
-        text_color_active:  app.custom_colors[app.theme_cls.theme_style]["accent"]                                    # Couleur du texte/icône sélectionné
-        text_color_normal:  app.custom_colors[app.theme_cls.theme_style]["bg_primary"]  # Couleur plus douce pour les inactifs
+        #panel_color: 1, 1, 1, 1  # Fond blanc pur
+        panel_color: app.custom_colors[app.theme_cls.theme_style]["bg_primary"]
+        selected_color_indicator: 0.1, 0.5, 0.8, 0.1  # Petite lueur derrière l'icône active
+        text_color_active: 0.1, 0.5, 0.8, 1  # Couleur du texte/icône sélectionné
+        text_color_normal: 0.5, 0.5, 0.5, 1  # Couleur plus douce pour les inactifs
         use_text: True  # Garder le texte ou pas selon ton envie
 
 
@@ -39,11 +78,11 @@
             name: 'dash'
             text: 'Dashboard'
             icon: 'home-analytics'
-            md_bg_color: 0.95, 0.95, 0.95, 1
+            md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_secondary"]
             font_size: "10sp"
 
-
-            DashboardScreen :
+            DashboardScreen:
+                id: dashboard_screen
 
 
 
@@ -52,7 +91,7 @@
             name: 'transac'
             text: 'Transaction'
             icon: 'bank-transfer'
-            md_bg_color: 0.9, 0.9, 0.9, 1
+            md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_secondary"]
             font_size: "10sp"
 
             #TransacScreen :
@@ -66,19 +105,21 @@
             name: 'budg'
             text: 'Budget'
             icon: 'wallet'
-            md_bg_color: 0.95, 0.95, 0.95, 1
+            md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_secondary"]
             font_size: "10sp"
 
             BudgetScreen :
+                id: budget_screen
         # ================= TAB 4 =================
         MDBottomNavigationItem:
             name: 'categ'
             text: 'Catégories'
             icon: 'folder-multiple-outline'
-            md_bg_color: 0.9, 0.9, 0.9, 1
+            md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_secondary"]
             font_size: "10sp"
 
             CategorieScreen :
+                id: categ_screen
 
         # ================= TAB 5 =================
         MDBottomNavigationItem:
@@ -86,5 +127,12 @@
             text: 'Paramètres'
             icon: 'cog-outline'
             font_size: "10sp"
+            md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_secondary"]
 
             ParametreScreen :
+
+    # La notification flottante (au dessus de tout, placée après MDBottomNavigation)
+    TopNotification:
+        id: top_notif
+        # Position initiale : au dessus du bord supérieur de l'écran
+        pos_hint: {"center_x": 0.5, "top": 1.5}
