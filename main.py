@@ -26,7 +26,7 @@ from models.parametre import ParametreModel
 
 #--- CONFIGUER LA TAILLE DE L'ÉCRAN (MOBILE)---
 #Window.size = (360, 640)
-Window.size = (288, 640)
+#Window.size = (288, 640)
 
 
 class WindowManager(MDScreenManager):
