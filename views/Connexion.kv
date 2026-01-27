@@ -1,0 +1,162 @@
+<KeyButton@MDCard>:
+    digit: ""
+    # On demande au manager d'écran (app.root) de trouver l'écran actuel
+    # et d'appeler sa fonction add_digit
+    on_release: app.root.current_screen.add_digit(root.digit)
+    size_hint: None, None
+    size: "80dp", "70dp"
+    elevation: 1
+    radius: [15, ]
+    ripple_behavior: True
+    md_bg_color: [1, 1, 1, 1] if app.theme_cls.theme_style == "Light" else [0.2, 0.2, 0.2, 1]
+    MDLabel:
+        text: root.digit
+        halign: "center"
+        font_style: "H5"
+        theme_text_color: "Primary"
+
+<LoginScreen>:
+    md_bg_color: [0.96, 0.97, 0.98, 1] if app.theme_cls.theme_style == "Light" else [0.13, 0.13, 0.13, 1]
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        padding: "20dp"
+        spacing: "20dp"
+
+        # --- SECTION HEADER ---
+        MDBoxLayout:
+            orientation: 'vertical'
+            adaptive_height: True
+            spacing: "20dp"
+            padding: [0, "40dp", 0, 0]
+
+            MDFloatLayout:
+                size_hint: None, None
+                size: "80dp", "80dp"
+                pos_hint: {"center_x": .5}
+                canvas.before:
+                    Color:
+                        rgba: 0.12, 0.53, 0.9, 1
+                    Ellipse:
+                        pos: self.pos
+                        size: self.size
+                MDIcon:
+                    icon: "lock-outline"
+                    theme_text_color: "Custom"
+                    text_color: 1, 1, 1, 1
+                    pos_hint: {"center_x": .5, "center_y": .5}
+                    font_size: "40dp"
+
+            MDLabel:
+                text: "MonBudget"
+                halign: "center"
+                font_style: "H6"
+                bold: True
+                theme_text_color: "Primary"
+
+            MDLabel:
+                id: error_label
+                text: ""
+                halign: "center"
+                font_style: "Caption"
+                theme_text_color: "Error"
+                size_hint_y: None
+                height: "20dp"
+                opacity: 0
+
+            MDLabel:
+                text: "Entrez votre code PIN"
+                halign: "center"
+                theme_text_color: "Secondary"
+                font_style: "Caption"
+
+        # --- SECTION INDICATEURS PIN ---
+        MDBoxLayout:
+            orientation: 'horizontal'
+            adaptive_size: True
+            pos_hint: {"center_x": .5}
+            spacing: "15dp"
+            padding: [0, "20dp", 0, "40dp"]
+
+            MDCard:
+                id: dot_1
+                size_hint: None, None
+                size: "15dp", "15dp"
+                radius: [7.5, ]
+                md_bg_color: [0.8, 0.8, 0.8, 0.5] if app.theme_cls.theme_style == "Light" else [0.5, 0.5, 0.5, 0.5]
+                elevation: 0
+            MDCard:
+                id: dot_2
+                size_hint: None, None
+                size: "15dp", "15dp"
+                radius: [7.5, ]
+                md_bg_color: [0.8, 0.8, 0.8, 0.5] if app.theme_cls.theme_style == "Light" else [0.5, 0.5, 0.5, 0.5]
+                elevation: 0
+            MDCard:
+                id: dot_3
+                size_hint: None, None
+                size: "15dp", "15dp"
+                radius: [7.5, ]
+                md_bg_color: [0.8, 0.8, 0.8, 0.5] if app.theme_cls.theme_style == "Light" else [0.5, 0.5, 0.5, 0.5]
+                elevation: 0
+            MDCard:
+                id: dot_4
+                size_hint: None, None
+                size: "15dp", "15dp"
+                radius: [7.5, ]
+                md_bg_color: [0.8, 0.8, 0.8, 0.5] if app.theme_cls.theme_style == "Light" else [0.5, 0.5, 0.5, 0.5]
+                elevation: 0
+
+        # --- SECTION CLAVIER ---
+        MDGridLayout:
+            cols: 3
+            adaptive_size: True
+            pos_hint: {"center_x": .5}
+            spacing: "15dp"
+            padding: "10dp"
+
+            KeyButton:
+                digit: "1"
+            KeyButton:
+                digit: "2"
+            KeyButton:
+                digit: "3"
+            KeyButton:
+                digit: "4"
+            KeyButton:
+                digit: "5"
+            KeyButton:
+                digit: "6"
+            KeyButton:
+                digit: "7"
+            KeyButton:
+                digit: "8"
+            KeyButton:
+                digit: "9"
+
+            # Bouton vide à gauche
+            MDWidget:
+                size_hint: None, None
+                size: "80dp", "70dp"
+
+            KeyButton:
+                digit: "0"
+
+            MDCard:
+                size_hint: None, None
+                size: "80dp", "70dp"
+                elevation: 1
+                radius: [15,]
+                md_bg_color: [1, 1, 1, 1] if app.theme_cls.theme_style == "Light" else [0.2, 0.2, 0.2, 1]
+                ripple_behavior: True
+                on_release: root.delete_digit()
+
+                AnchorLayout:
+                    anchor_x: "center"
+                    anchor_y: "center"
+
+                    MDIcon:
+                        icon: "backspace-outline"
+                        theme_text_color: "Primary"
+        # Spacer pour pousser tout vers le haut
+        MDWidget:

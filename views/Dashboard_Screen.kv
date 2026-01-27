@@ -1,0 +1,282 @@
+<StatCard>:
+    orientation: 'vertical'
+    padding: dp(10)
+    spacing: dp(5)
+    MDLabel:
+        text: root.titre
+        font_style: "Subtitle2"                    # ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'Subtitle1', 'Subtitle2', 'Body1', 'Body2', 'Button', 'Caption', 'Overline', 'Icon']
+        halign: "left"
+    MDLabel:
+        text: root.montant
+        theme_text_color: "Custom"
+        text_color: root.couleur_texte
+        font_style: "H6"
+        halign: "left"
+        bold: True
+
+    MDLabel:
+        text: 'FC'
+        theme_text_color: "Secondary"
+#        text_color: root.couleur_texte
+        font_style: "Subtitle2"
+
+
+
+<ItemCategorie@MDBoxLayout>:
+    nom: ""
+    montant: ""
+    icone: "circle"
+    couleur_icone: 1, 1, 1, 1
+    orientation: 'horizontal'
+    adaptive_height: True
+    spacing: dp(15)
+    padding: [dp(5), dp(10)]
+
+    MDIcon:
+        icon: root.icone
+        theme_text_color: "Secondary"
+        #theme_text_color: "Custom"
+        #text_color: root.couleur_icone
+        pos_hint: {"center_y": .5}
+        font_size: "20sp"
+
+    MDLabel:
+        text: root.nom
+        theme_text_color: "Secondary"
+        halign: "left"
+        font_style: "Subtitle2"
+        pos_hint: {"center_y": .5}
+
+    MDLabel:
+        text: root.montant
+        halign: "right"
+        bold: True
+        font_style: "Subtitle2"
+        pos_hint: {"center_y": .5}
+
+
+
+<GraphiqueBarres>:
+    orientation: 'vertical'
+    padding: dp(10)
+
+    # Zone des axes et des barres (dessinée dynamiquement en Python)
+    MDBoxLayout:
+        id: chart_area
+        size_hint_y: 0.8
+
+    # Étiquettes des mois (alimentées dynamiquement)
+    MDBoxLayout:
+        size_hint_y: 0.1
+        padding: [dp(40), 0, 0, 0]
+        MDLabel:
+            id: month_lbl_0
+            text: ""
+            font_style: "Caption"
+        MDLabel:
+            id: month_lbl_1
+            text: ""
+            font_style: "Caption"
+        MDLabel:
+            id: month_lbl_2
+            text: ""
+            font_style: "Caption"
+
+    # Légende (Revenus / Dépenses)
+    MDBoxLayout:
+        size_hint_y: 0.1
+        spacing: dp(10)
+        padding: [dp(40), 0, 0, 0]
+
+        MDBoxLayout:
+            #adaptive_width: True
+            orientation: 'horizontal'
+            spacing: dp(15)
+            MDIcon:
+                icon: "checkbox-blank"
+                theme_text_color: "Custom"
+                text_color: 0.1, 0.7, 0.3, 1
+                font_size: "14sp"
+                adaptive_height: True
+
+            MDLabel:
+                text: "Revenus"
+                font_style: "Caption"
+                theme_text_color: "Custom"
+                text_color: 0.1, 0.7, 0.3, 1
+                adaptive_height: True
+
+        MDBoxLayout:
+            #adaptive_width: True
+            orientation: 'horizontal'
+            spacing: dp(15)
+
+            MDIcon:
+                icon: "checkbox-blank"
+                theme_text_color: "Custom"
+                text_color: 1, 0.3, 0.5, 1
+                font_size: "14sp"
+                adaptive_height: True
+            MDLabel:
+                text: "Dépenses"
+                font_style: "Caption"
+                theme_text_color: "Custom"
+                text_color: 1, 0.3, 0.5, 1
+                adaptive_height: True
+
+
+
+
+
+# ECRAN PRINCIPAL
+<DashboardScreen>:
+    # Conteneur de la page
+    MDBoxLayout:
+        orientation: 'vertical'
+        size_hint_y: 1
+
+        # EN-TÊTE
+        Header:
+            title: 'MonBudget'
+            subtitle: 'Bienvenu'
+
+        # Conteneur pour le contenu principale (Statistiques)
+        MDFloatLayout:
+            size_hint_y: 1
+
+            MDScrollView:
+                do_scroll_x: False
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    adaptive_height: True
+                    padding: dp(10)
+                    spacing: dp(10)
+
+                    # 1. CARTE SOLDE DU MOIS
+                    MDCard:
+                        orientation: 'vertical'
+                        size_hint_y: None
+                        height: dp(100)
+                        radius: dp(0)
+                        padding: dp(10)
+                        #spacing: dp(10)
+                        elevation: 0
+
+                        MDLabel:
+                            text: "Solde du mois"
+                            halign: "left"
+                        MDLabel:
+                            text: root.solde_mois
+                            font_style: "H6"
+                            halign: "left"
+                            theme_text_color: "Primary"
+                            #bold: True
+
+                    # 2. CARTES REVENUS ET DÉPENSES (Total)
+                    MDBoxLayout:
+                        adaptive_height: True
+                        spacing: dp(15)
+
+                        # Dépenses
+                        MDCard:
+                            adaptive_height: True
+                            radius: dp(15)
+                            StatCard:
+                                titre: "Dépenses"
+                                montant: root.total_depenses
+                                couleur_texte: 1, 0.3, 0.3, 1 # Rose/Rouge
+
+                        # Revenus
+                        MDCard:
+                            radius: dp(0)
+                            adaptive_height: True
+                            StatCard:
+                                titre: "Revenus"
+                                montant: root.total_revenus
+                                couleur_texte: 0.1, 0.7, 0.3, 1 # Vert
+
+                    # 3. DÉPENSES PAR CATÉGORIE
+                    MDBoxLayout:
+                        adaptive_height: True
+                        #spacing: dp(15)
+
+                        MDCard:
+                            orientation: 'vertical'
+                            adaptive_height: True
+                            padding: dp(15)
+                            spacing: dp(15)
+                            radius: dp(15)
+                            elevation: 0
+
+                            MDLabel:
+                                text: "Dépenses par catégorie"
+                                adaptive_height: True
+
+                            # Graphique Circulaire (Pie Chart)
+                            MDBoxLayout:
+                                size_hint: None, None
+                                size: dp(140), dp(140)
+                                pos_hint: {"center_x": .5}
+                                
+                                PieChart:
+                                    id: chart_pie
+                                    size_hint: 1, 1
+
+                            # Liste des items
+                            MDBoxLayout:
+                                id: box_categories_stats
+                                orientation: 'vertical'
+                                adaptive_height: True
+                                spacing: dp(5)
+
+                    # 4. ZONE GRAPHIQUE : Revenus VS Dépenses
+                    MDBoxLayout:
+                        adaptive_height: True
+                        #spacing: dp(15)
+
+                        MDCard:
+                            orientation: 'vertical'
+                            size_hint_y: None
+                            height: dp(250)
+                            radius: dp(15)
+                            padding: dp(15)
+
+                            MDLabel:
+                                text: "Revenus vs Dépenses"
+                                bold: True
+                                adaptive_height: True
+
+                            GraphiqueBarres:
+                                id: graph_barres
+
+
+
+            MDFloatingActionButton:
+                # 1. Icône petite
+                icon: "microphone"
+                icon_size: dp(30)              # Taille de l'image interne
+
+                # 2. Couleurs
+                md_bg_color: 0.2, 0.6, 0.2
+                theme_icon_color: "Custom"
+                icon_color: 1, 1, 1, 1
+
+                # 3. TAILLE RÉDUITE (La clé est ici)
+                type: "standard"                  # On passe en 'small' au lieu de 'large'
+                size_hint: None, None
+                size: dp(45), dp(45)           # Taille du cercle (ne descends pas trop bas pour le tactile)
+                #radius: [dp(12)]              # Garde l'aspect arrondi/carré
+
+                # 4. POSITION PROPORTIONNELLE
+                # x: 0.85 place le bouton à 85% de la largeur (à droite)
+                # y: 0.12 le place à 12% de la hauteur (juste au dessus de la barre de navigation)
+                pos_hint: {"center_x": 0.15, "center_y": 0.10}
+
+                #elevation: 3
+                elevation: 0
+                shadow_softness: 0
+                shadow_radius: [0,0,0,0]
+
+
+
+

@@ -1,0 +1,446 @@
+<TransacScreen_Manager>:
+    TransacScreen:
+        name : 'list_screen'
+    TransacAddScreen:
+        name: 'add_screen'
+
+
+
+
+<Transaction_card>:
+    # Propriété personnalisables
+    icon_:''
+    couleur_: 0, 0, 0, 1
+    nom_: ''
+    categorie_: ''
+    montant_: 0
+    date_: ''
+    mois_: ''
+
+    # Propriété de MDCard
+    orientation: 'vertical'
+    #adaptive_height: True
+    size_hint_y: None
+    height: dp(120)
+    padding: dp(12)
+    spacing: dp(8)
+    #elevation: 0.5
+    radius: [15]
+    #md_bg_color: md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_primary"]
+
+    # Partie superieur (icone, nom, catégorie, montant)
+    MDBoxLayout:
+        orientation: 'horizontal'
+        adaptive_height: True
+        #size_hint_y: None
+        #height: dp(50)
+        spacing: dp(12)
+
+        MDIcon:
+            icon: root.icon_
+            theme_text_color: 'Custom'
+            text_color: root.couleur_
+            md_bg_color: root.couleur_[0], root.couleur_[1], root.couleur_[2], 0.3
+            size_hint: None, None
+            size: dp(48), dp(48)
+            padding:dp(12)
+            #spacing: dp(12)
+
+
+        # Nom et categorie
+        MDBoxLayout:
+            orientation: 'vertical'
+            size_hint_x: 1
+            #padding: [0]
+
+            MDLabel:
+                text: root.nom_
+                font_styles: 'Caption'
+                font_size: dp(14)
+                bold: True
+                shorten: True
+                shorten_from: 'right'
+                halign: 'left'
+                #adaptive_width: True
+                #md_bg_color: 0.9, 0.9, 0.9, 1
+
+            MDLabel:
+                text: root.categorie_
+                font_styles: 'Caption'
+                font_size: dp(12)
+                theme_text_color: 'Secondary'
+                halign: 'left'
+
+        # Montant et devise
+        MDBoxLayout:
+            orientation: 'vertical'
+            size_hint_x: None
+            min_width: dp(30)
+            adaptive_width: True  # S'ajuste exactement à la largeur du texte
+
+            MDLabel:
+                text: f"{root.montant_}"
+                font_styles: 'Caption'
+                font_size: dp(14)
+                theme_text_color: 'Custom'
+                text_color: root.couleur_
+                bold: True
+                halign: 'right'
+                adaptive_width: True
+                #md_bg_color: 0.9, 0.9, 0.9, 1
+
+            MDLabel:
+                #text: root.devise
+                text: 'FC'
+                font_styles: 'Caption'
+                font_size: dp(12)
+                theme_text_color: 'Secondary'
+                halign: 'right'
+                #adaptive_width: True
+
+    # Partie inferieur (séparateur, Date, mois)
+    MDSeparator:
+        height: dp(1)
+
+    # Date et mois
+    MDBoxLayout:
+        orientation: 'horizontal'
+        #adaptive_height: True
+        size_hint_y : None
+        height: dp(25)
+
+        MDLabel:
+            text: root.date_
+            font_styles: 'Caption'
+            font_size: dp(12)
+            halign: 'left'
+            #theme_text_color: 'Hint'
+
+        MDLabel:
+            text: root.mois_
+            font_styles: 'Caption'
+            font_size: dp(12)
+            halign: 'right'
+            adaptive_width: True
+            markup: True
+            md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_secondary"]
+            padding: dp(5)
+
+
+
+
+
+
+
+<TransacScreen>:
+    MDBoxLayout:
+        orientation: 'vertical'
+        size_hint_y: 1
+        md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_secondary"]
+
+        # En-tête
+        Header:
+            title: 'Transactions'
+            subtitle: 'Historique complet'
+
+        MDFloatLayout:
+            size_hint_y: 1
+            md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_secondary"]
+            MDScrollView:
+                do_scroll_x: False
+                pos_hint: {"top": 1} # Colle le scroll au haut du FloatLayout
+                size_hint_y: 1       # Force le scroll à prendre toute la hauteur du Float
+
+                # Barre de recherche et Filtres
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_secondary"]
+                    #md_bg_color: 0.9, 0.9, 0.9, 1
+                    padding: dp(16)
+                    spacing: dp(20)
+                    adaptive_height: True
+
+                    # Barre de recherche
+                    MDTextField:
+                        id: barre_recherche
+                        hint_text: 'Rechercher par nom...'
+                        mode: 'round'         #['rectangle', 'round', 'fill', 'line']
+                        icon_left :'magnify'
+                        on_text: root.filtrer_transaction()         # À chaque lettre qu'on saisi, la fonction rechercher_transaction s'exécute
+
+                    #Liste Categorie
+                    MDLabel:
+                        text: 'Categories'
+                        font_styles: "Caption"
+                        theme_text_color: "Secondary"
+                        adaptive_height: True
+
+                    MDDropDownItem:
+                        id: menu_categories
+                        text: "Toutes"
+                        pos_hint: {'center_x':.5}
+                        size_hint_x: 1
+                        on_release: root.ouvrir_menu(root.list_categories,self )
+
+
+                    MDLabel:
+                        text: "Mois"
+                        font_styles: "Caption"
+                        theme_text_color: "Secondary"
+                        adaptive_height: True
+
+                    MDDropDownItem:
+                        id: menu_mois
+                        text: 'Tous'
+                        pos_hint: {'center_x': 0.5}
+                        size_hint_x: 1
+                        on_release: root.ouvrir_menu(root.list_mois,self)
+
+                    # Bouton pour Reinitialiser les filtres
+                    MDRectangleFlatIconButton:
+                        icon: "refresh"
+                        text: "Reinitialiser les filtres"
+                        size_hint_x: 1
+                        #pos_hint_x: {'center_x': .5}
+                        on_release: root.reinitialiser_filtres()
+
+
+                    # Nombre de transactions trouvées
+                    MDLabel:
+                        id: nb_transaction
+                        text: ""
+                        adaptive_height: True
+                        theme_text_color: "Secondary"
+
+                    # Conteneur des transactions
+                    MDBoxLayout:
+                        id: conteneur_transaction
+                        orientation: 'vertical'
+                        adaptive_height: True
+                        spacing: dp(10)
+
+                        Transaction_card:
+                            icon_: 'car'
+                            couleur_ : 0.9, 0.5, 0.5, 1
+                            nom_: 'Carburant'
+                            categorie_: 'Transport'
+                            #montant_: '- 10 000'
+                            date_: '28 Décembre 2025'
+                            mois_: 'Décembre'
+
+                        Transaction_card:
+                            icon_: 'cash-multiple'
+                            couleur_ : 0.5, 0.9, 0.5, 1
+                            nom_: 'Freelance'
+                            categorie_: 'Salaire'
+                            #montant_: '+ 15 000'
+                            date_: '31 Décembre 2025'
+                            mois_: 'Décembre'
+
+            MDFloatingActionButton:
+                # 1. Icône petite
+                icon: "plus-circle-outline"
+                icon_size: dp(30)              # Taille de l'image interne
+
+                # 2. Couleurs
+                md_bg_color: app.custom_colors[app.theme_cls.theme_style]["accent"]
+                theme_icon_color: "Custom"
+                icon_color: 1, 1, 1, 1
+
+                # 3. TAILLE RÉDUITE (La clé est ici)
+                type: "standard"                  # On passe en 'small' au lieu de 'large'
+                size_hint: None, None
+                size: dp(45), dp(45)           # Taille du cercle (ne descends pas trop bas pour le tactile)
+                #radius: [dp(12)]              # Garde l'aspect arrondi/carré
+
+                # 4. POSITION PROPORTIONNELLE
+                # x: 0.85 place le bouton à 85% de la largeur (à droite)
+                # y: 0.12 le place à 12% de la hauteur (juste au dessus de la barre de navigation)
+                pos_hint: {"center_x": 0.87, "center_y": 0.10}
+
+                #elevation: 3
+                elevation: 0
+                shadow_softness: 0
+                shadow_radius: [0,0,0,0]
+
+
+                on_release:
+                    # On cherche le ScreenManager 'transac_sm' défini dans Template.kv
+                    root.manager.transition.direction = 'left'
+                    root.manager.current='add_screen'
+
+
+
+
+<TransacAddScreen>:
+    MDBoxLayout:
+        orientation: 'vertical'
+        md_bg_color: 0.96, 0.96, 0.98, 1  # Un gris très léger comme sur ton image
+
+        # En-tête avec bouton retour personnalisé
+        MDBoxLayout:
+            size_hint_y: None
+            height: dp(60)
+            padding: [dp(0), 0]
+            spacing: dp(10)
+            md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_primary"]
+
+            MDIconButton:
+                icon: "arrow-left"
+                pos_hint: {"center_y": .5}
+                on_release:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'list_screen'
+
+            MDLabel:
+                text: "Ajouter une transaction"
+                font_style: "H6"
+                pos_hint: {"center_y": .5}
+
+        MDScrollView:
+            MDBoxLayout:
+                orientation: 'vertical'
+                padding: dp(20)
+                spacing: dp(24)
+                adaptive_height: True
+                md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_secondary"]
+
+                # --- SECTION MONTANT ---
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    spacing: dp(8)
+                    adaptive_height: True
+
+                    MDLabel:
+                        text: "Montant (FC)"
+                        theme_text_color: "Secondary"
+                        font_style: "Caption"
+
+                    MDTextField:
+                        id: montant_transac  # ID pour accéder depuis Python
+                        text: "0"
+                        halign: "left"
+                        font_size: "48sp"
+                        mode: "line"            #fill
+                        fill_color_normal: 0, 0, 0, 0 # Transparent
+                        input_filter: "float"
+
+                # --- SECTION TYPE (Dépense / Revenu) ---
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    spacing: dp(12)
+                    adaptive_height: True
+
+                    MDLabel:
+                        text: "Type"
+                        theme_text_color: "Secondary"
+                        font_style: "Caption"
+
+                    MDBoxLayout:
+                        spacing: dp(10)
+                        adaptive_height: True
+
+                        MDRaisedButton:
+                            id: btn_depense
+                            text: "Dépense"
+                            md_bg_color: 1, 0.35, 0.45, 1 # Rose/Rouge
+                            size_hint_x: 0.5
+                            on_release: root.choisir_type(self.text)
+
+                        MDRaisedButton:
+                            id: btn_revenu
+                            text: "Revenu"
+                            theme_text_color: "Custom"
+                            text_color: 0.4, 0.4, 0.5, 1
+                            md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_secondary"]
+                            size_hint_x: 0.5
+                            elevation: 0
+                            on_release: root.choisir_type(self.text)
+
+                # --- SECTION CATÉGORIE ---
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    spacing: dp(8)
+                    adaptive_height: True
+
+                    MDLabel:
+                        text: "Catégorie"
+                        theme_text_color: "Secondary"
+                        font_style: "Caption"
+
+                    MDDropDownItem:
+                        id: menu_categories2
+                        text: "Sélectionner une catégorie"
+                        size_hint_x: 1
+                        on_release: root.ouvrir_menu_cat()
+
+                # --- SECTION DATE ---
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    spacing: dp(8)
+                    adaptive_height: True
+
+                    MDLabel:
+                        text: "Date"
+                        theme_text_color: "Secondary"
+                        font_style: "Caption"
+
+                    MDBoxLayout:
+                        spacing: dp(10)
+                        orientation : 'horizontal'
+                        adaptive_height: True
+
+                        MDLabel:
+                            id: date_transac
+                            text: "29/12/2025" # On dynamisera cela plus tard
+ #                           adaptive_width: True
+                            halign: 'left'
+                            pos_hint: {"center_y": .5}
+
+                        MDIconButton:
+                            icon: "calendar-month-outline"                #calendar-outline
+                            adaptive_height_y: True
+                            halign: 'right'
+                            pos_hint: {"center_y": .5}
+                            #padding: [0]
+#                            adaptive_width: True
+                            on_release: root.saisir_date()
+
+                # --- SECTION NOTE ---
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    spacing: dp(8)
+                    adaptive_height: True
+
+                    MDLabel:
+                        text: "Note (optionnel)"
+                        theme_text_color: "Secondary"
+                        font_style: "Caption"
+
+                    MDTextField:
+                        id: description_transac  # ID pour accéder depuis Python
+                        hint_text: "Nom de la transaction..."
+                        mode: "line"        #fill
+                        fill_color_normal: 0, 0, 0, 0.03
+                        #size_hint_y: dp(200)
+                        multiline: True
+
+                # --- BOUTONS D'ACTION ---
+                MDBoxLayout:
+                    spacing: dp(15)
+                    #padding: [0, dp(20)]
+                    adaptive_height: True
+
+
+                    MDRectangleFlatButton:
+                        text: "ANNULER"
+                        size_hint_x: 0.5
+                        #pos_hint: {"center_y": .1}
+                        on_release:
+                            root.manager.current = 'list_screen'
+
+                    MDRaisedButton:
+                        text: "Ajouter"
+                        size_hint_x: 0.5
+                        md_bg_color: 0.1, 0.4, 0.9, 1
+                        on_release: root.ajouter_transaction()  # Lien vers la fonction Python

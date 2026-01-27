@@ -1,0 +1,471 @@
+{
+  "export_date": "2026-01-27T18:35:05.187796",
+  "transactions": [
+    {
+      "id_transaction": 29,
+      "id_compte": 1,
+      "id_categorie": 17,
+      "montant": 100.0,
+      "type_transaction": "SORTIE",
+      "description": "jekeek",
+      "date_transaction": "2026-01-27",
+      "date_creation": "2026-01-27 16:04:33",
+      "date_modification": "2026-01-27 16:04:33"
+    },
+    {
+      "id_transaction": 25,
+      "id_compte": 1,
+      "id_categorie": 16,
+      "montant": 10000.0,
+      "type_transaction": "ENTREE",
+      "description": "ANANAS",
+      "date_transaction": "2026-01-13",
+      "date_creation": "2026-01-13 17:09:42",
+      "date_modification": "2026-01-13 17:09:42"
+    },
+    {
+      "id_transaction": 26,
+      "id_compte": 1,
+      "id_categorie": 16,
+      "montant": 111111.0,
+      "type_transaction": "ENTREE",
+      "description": "aaaaaaaaaaaa",
+      "date_transaction": "2026-01-13",
+      "date_creation": "2026-01-13 18:11:12",
+      "date_modification": "2026-01-13 18:11:12"
+    },
+    {
+      "id_transaction": 27,
+      "id_compte": 1,
+      "id_categorie": 16,
+      "montant": 111111.0,
+      "type_transaction": "ENTREE",
+      "description": "aaaaaaaaaaaa",
+      "date_transaction": "2026-01-13",
+      "date_creation": "2026-01-13 18:18:47",
+      "date_modification": "2026-01-13 18:18:47"
+    },
+    {
+      "id_transaction": 18,
+      "id_compte": 1,
+      "id_categorie": 5,
+      "montant": 200.0,
+      "type_transaction": "ENTREE",
+      "description": "test_course",
+      "date_transaction": "2026-01-12",
+      "date_creation": "2026-01-12 10:58:23",
+      "date_modification": "2026-01-12 10:58:23"
+    },
+    {
+      "id_transaction": 19,
+      "id_compte": 1,
+      "id_categorie": 12,
+      "montant": 30000.0,
+      "type_transaction": "SORTIE",
+      "description": "perte de fonds",
+      "date_transaction": "2026-01-12",
+      "date_creation": "2026-01-12 10:59:18",
+      "date_modification": "2026-01-12 10:59:18"
+    },
+    {
+      "id_transaction": 20,
+      "id_compte": 1,
+      "id_categorie": 12,
+      "montant": 100000.0,
+      "type_transaction": "ENTREE",
+      "description": "test revenu",
+      "date_transaction": "2026-01-12",
+      "date_creation": "2026-01-12 11:09:20",
+      "date_modification": "2026-01-12 11:09:20"
+    },
+    {
+      "id_transaction": 21,
+      "id_compte": 1,
+      "id_categorie": 9,
+      "montant": 1000.0,
+      "type_transaction": "SORTIE",
+      "description": "test cinema",
+      "date_transaction": "2026-01-12",
+      "date_creation": "2026-01-12 11:10:18",
+      "date_modification": "2026-01-12 11:10:18"
+    },
+    {
+      "id_transaction": 22,
+      "id_compte": 1,
+      "id_categorie": 9,
+      "montant": 40000.0,
+      "type_transaction": "SORTIE",
+      "description": "test ajout",
+      "date_transaction": "2026-01-12",
+      "date_creation": "2026-01-12 11:11:06",
+      "date_modification": "2026-01-12 11:11:06"
+    },
+    {
+      "id_transaction": 23,
+      "id_compte": 1,
+      "id_categorie": 4,
+      "montant": 10000.0,
+      "type_transaction": "SORTIE",
+      "description": "test fast",
+      "date_transaction": "2026-01-12",
+      "date_creation": "2026-01-12 16:32:06",
+      "date_modification": "2026-01-12 16:32:06"
+    },
+    {
+      "id_transaction": 24,
+      "id_compte": 1,
+      "id_categorie": 17,
+      "montant": 1000.0,
+      "type_transaction": "ENTREE",
+      "description": "Cat",
+      "date_transaction": "2026-01-11",
+      "date_creation": "2026-01-13 16:25:30",
+      "date_modification": "2026-01-13 16:25:30"
+    },
+    {
+      "id_transaction": 15,
+      "id_compte": 1,
+      "id_categorie": 6,
+      "montant": 9000.0,
+      "type_transaction": "SORTIE",
+      "description": "telephone",
+      "date_transaction": "2026-01-10",
+      "date_creation": "2026-01-10 17:24:43",
+      "date_modification": "2026-01-10 17:24:43"
+    },
+    {
+      "id_transaction": 16,
+      "id_compte": 1,
+      "id_categorie": 16,
+      "montant": 18000.0,
+      "type_transaction": "SORTIE",
+      "description": "test ",
+      "date_transaction": "2026-01-10",
+      "date_creation": "2026-01-10 17:28:43",
+      "date_modification": "2026-01-10 17:28:43"
+    },
+    {
+      "id_transaction": 17,
+      "id_compte": 1,
+      "id_categorie": 5,
+      "montant": 29000.0,
+      "type_transaction": "SORTIE",
+      "description": "katana",
+      "date_transaction": "2026-01-10",
+      "date_creation": "2026-01-10 17:29:11",
+      "date_modification": "2026-01-10 17:29:11"
+    },
+    {
+      "id_transaction": 1,
+      "id_compte": 1,
+      "id_categorie": 16,
+      "montant": 2000.0,
+      "type_transaction": "SORTIE",
+      "description": "",
+      "date_transaction": "2025-12-29",
+      "date_creation": "2026-01-10 13:24:27",
+      "date_modification": "2026-01-10 13:24:27"
+    },
+    {
+      "id_transaction": 2,
+      "id_compte": 1,
+      "id_categorie": 8,
+      "montant": 10000.0,
+      "type_transaction": "ENTREE",
+      "description": "test income revenu",
+      "date_transaction": "2025-12-29",
+      "date_creation": "2026-01-10 13:46:31",
+      "date_modification": "2026-01-10 13:46:31"
+    },
+    {
+      "id_transaction": 3,
+      "id_compte": 1,
+      "id_categorie": 17,
+      "montant": 200.0,
+      "type_transaction": "SORTIE",
+      "description": "test transaction",
+      "date_transaction": "2025-12-29",
+      "date_creation": "2026-01-10 13:53:13",
+      "date_modification": "2026-01-10 13:53:13"
+    },
+    {
+      "id_transaction": 7,
+      "id_compte": 1,
+      "id_categorie": 18,
+      "montant": 10000.0,
+      "type_transaction": "SORTIE",
+      "description": "test_ajout transaction",
+      "date_transaction": "2025-12-29",
+      "date_creation": "2026-01-10 14:34:26",
+      "date_modification": "2026-01-10 14:34:26"
+    },
+    {
+      "id_transaction": 8,
+      "id_compte": 1,
+      "id_categorie": 18,
+      "montant": 1000.0,
+      "type_transaction": "SORTIE",
+      "description": "test notification",
+      "date_transaction": "2025-12-29",
+      "date_creation": "2026-01-10 14:36:10",
+      "date_modification": "2026-01-10 14:36:10"
+    },
+    {
+      "id_transaction": 9,
+      "id_compte": 1,
+      "id_categorie": 18,
+      "montant": 10000.0,
+      "type_transaction": "SORTIE",
+      "description": "test depense",
+      "date_transaction": "2025-12-29",
+      "date_creation": "2026-01-10 14:45:20",
+      "date_modification": "2026-01-10 14:45:20"
+    },
+    {
+      "id_transaction": 10,
+      "id_compte": 1,
+      "id_categorie": 8,
+      "montant": 20000.0,
+      "type_transaction": "ENTREE",
+      "description": "test cadeau",
+      "date_transaction": "2025-12-29",
+      "date_creation": "2026-01-10 14:47:57",
+      "date_modification": "2026-01-10 14:47:57"
+    },
+    {
+      "id_transaction": 12,
+      "id_compte": 1,
+      "id_categorie": 18,
+      "montant": 5000.0,
+      "type_transaction": "SORTIE",
+      "description": "test transac",
+      "date_transaction": "2025-12-29",
+      "date_creation": "2026-01-10 16:58:02",
+      "date_modification": "2026-01-10 16:58:02"
+    },
+    {
+      "id_transaction": 13,
+      "id_compte": 1,
+      "id_categorie": 16,
+      "montant": 23000.0,
+      "type_transaction": "SORTIE",
+      "description": "test ananas",
+      "date_transaction": "2025-12-29",
+      "date_creation": "2026-01-10 17:01:04",
+      "date_modification": "2026-01-10 17:01:04"
+    },
+    {
+      "id_transaction": 14,
+      "id_compte": 1,
+      "id_categorie": 18,
+      "montant": 1000.0,
+      "type_transaction": "SORTIE",
+      "description": "test 1",
+      "date_transaction": "2025-12-29",
+      "date_creation": "2026-01-10 17:16:15",
+      "date_modification": "2026-01-10 17:16:15"
+    },
+    {
+      "id_transaction": 4,
+      "id_compte": 1,
+      "id_categorie": 17,
+      "montant": 2000.0,
+      "type_transaction": "SORTIE",
+      "description": "test transac 2",
+      "date_transaction": "2025-12-11",
+      "date_creation": "2026-01-10 14:21:23",
+      "date_modification": "2026-01-10 14:21:23"
+    },
+    {
+      "id_transaction": 5,
+      "id_compte": 1,
+      "id_categorie": 18,
+      "montant": 1000.0,
+      "type_transaction": "SORTIE",
+      "description": "test_transac",
+      "date_transaction": "2025-12-11",
+      "date_creation": "2026-01-10 14:22:52",
+      "date_modification": "2026-01-10 14:22:52"
+    },
+    {
+      "id_transaction": 6,
+      "id_compte": 1,
+      "id_categorie": 18,
+      "montant": 10.0,
+      "type_transaction": "SORTIE",
+      "description": "test_transac2",
+      "date_transaction": "2025-12-11",
+      "date_creation": "2026-01-10 14:23:25",
+      "date_modification": "2026-01-10 14:23:25"
+    },
+    {
+      "id_transaction": 11,
+      "id_compte": 1,
+      "id_categorie": 17,
+      "montant": 49000.0,
+      "type_transaction": "SORTIE",
+      "description": "test_budget",
+      "date_transaction": "2025-11-12",
+      "date_creation": "2026-01-10 15:45:36",
+      "date_modification": "2026-01-10 15:45:36"
+    },
+    {
+      "id_transaction": 28,
+      "id_compte": 1,
+      "id_categorie": 17,
+      "montant": 50000.0,
+      "type_transaction": "SORTIE",
+      "description": "transaction",
+      "date_transaction": "2025-01-14",
+      "date_creation": "2026-01-14 15:43:20",
+      "date_modification": "2026-01-14 15:43:20"
+    }
+  ],
+  "categories": [
+    {
+      "id_categorie": 18,
+      "nom_categorie": "test transac",
+      "type_transaction": "SORTIE",
+      "icone": "school",
+      "couleur": "0.1,0.8,0.1,1",
+      "date_creation": "2026-01-10 14:22:07",
+      "date_modification": "2026-01-10 14:22:07"
+    },
+    {
+      "id_categorie": 17,
+      "nom_categorie": "test categorie",
+      "type_transaction": "SORTIE",
+      "icone": "hammer-wrench",
+      "couleur": "0.1,0.8,0.1,1",
+      "date_creation": "2026-01-10 13:49:19",
+      "date_modification": "2026-01-10 13:49:19"
+    },
+    {
+      "id_categorie": 16,
+      "nom_categorie": "ananas",
+      "type_transaction": "SORTIE",
+      "icone": "food",
+      "couleur": "1,0.7,0,1",
+      "date_creation": "2026-01-10 13:18:13",
+      "date_modification": "2026-01-10 13:18:13"
+    },
+    {
+      "id_categorie": 4,
+      "nom_categorie": "Loisirs",
+      "type_transaction": "SORTIE",
+      "icone": "controller-classic",
+      "couleur": "0.6,0.3,0.7,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-10 13:17:44"
+    },
+    {
+      "id_categorie": 5,
+      "nom_categorie": "Courses",
+      "type_transaction": "SORTIE",
+      "icone": "cart",
+      "couleur": "0.1,0.7,0.7,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-10 13:17:44"
+    },
+    {
+      "id_categorie": 6,
+      "nom_categorie": "Telephone",
+      "type_transaction": "SORTIE",
+      "icone": "phone-settings",
+      "couleur": "0.5,0.5,0.5,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-10 13:17:44"
+    },
+    {
+      "id_categorie": 7,
+      "nom_categorie": "Café",
+      "type_transaction": "SORTIE",
+      "icone": "coffee",
+      "couleur": "0.44,0.26,0.13,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-10 13:17:44"
+    },
+    {
+      "id_categorie": 8,
+      "nom_categorie": "Cadeaux",
+      "type_transaction": "SORTIE",
+      "icone": "gift",
+      "couleur": "0.9,0.3,0.23,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-10 13:17:44"
+    },
+    {
+      "id_categorie": 9,
+      "nom_categorie": "Cinéma",
+      "type_transaction": "SORTIE",
+      "icone": "movie",
+      "couleur": "0.2,0.2,0.2,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-10 13:17:44"
+    },
+    {
+      "id_categorie": 10,
+      "nom_categorie": "Etudes",
+      "type_transaction": "SORTIE",
+      "icone": "school",
+      "couleur": "0.12,0.5,0.7,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-10 13:17:44"
+    },
+    {
+      "id_categorie": 11,
+      "nom_categorie": "Santé",
+      "type_transaction": "SORTIE",
+      "icone": "medical-bag",
+      "couleur": "0.95,0.2,0.4,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-10 13:17:44"
+    },
+    {
+      "id_categorie": 12,
+      "nom_categorie": "Business",
+      "type_transaction": "SORTIE",
+      "icone": "trending-up",
+      "couleur": "0.1,0.3,0.5,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-10 13:17:44"
+    },
+    {
+      "id_categorie": 13,
+      "nom_categorie": "Énergie",
+      "type_transaction": "SORTIE",
+      "icone": "lightning-bolt",
+      "couleur": "1,0.8,0.2,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-10 13:17:44"
+    },
+    {
+      "id_categorie": 14,
+      "nom_categorie": "Éducation",
+      "type_transaction": "SORTIE",
+      "icone": "book-open-variant",
+      "couleur": "0.5,0.4,0.3,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-10 13:17:44"
+    },
+    {
+      "id_categorie": 15,
+      "nom_categorie": "Salaire",
+      "type_transaction": "ENTREE",
+      "icone": "cash-multiple",
+      "couleur": "0.15,0.68,0.37,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-10 13:17:44"
+    }
+  ],
+  "budgets": [
+    {
+      "id_budget": 1,
+      "id_compte": 1,
+      "budget_total": 0.0,
+      "jours_restants": 20,
+      "date_creation": "2026-01-10 13:45:36",
+      "date_modification": "2026-01-13 11:31:52"
+    }
+  ]
+}

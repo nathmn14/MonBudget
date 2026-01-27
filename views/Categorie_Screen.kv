@@ -1,0 +1,219 @@
+####################################################
+# 1. LA CLASSE POUR CHAQUE CATÉGORIE               #
+####################################################
+<Categorie_Card>:
+    #PROPRIÉTÉS PERSONNALISABLE
+    nom : ''
+    icon: ''
+    couleur: 1,1,1
+    bg_categorie: root.couleur[0],root.couleur[1],root.couleur[2],0.15
+    txt_categorie: root.couleur[0],root.couleur[1],root.couleur[2],1
+
+    #Propiétés de MDCard
+    md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_primary"]
+    radius: [10]
+    size_hint_y: None
+    height: dp(56)
+
+    MDBoxLayout:
+        orientation: 'horizontal'
+        padding: dp(12)
+        spacing: dp(12)
+
+        #Icone Gauche (Icone de la catégorie
+        MDIcon:
+            icon: root.icon
+            theme_text_color: "Custom"
+            text_color: root.txt_categorie
+            md_bg_color: root.bg_categorie
+            size_hint_x: None
+            width: dp(24)
+            pos_hint: {"center_y": .5}
+            padding: dp(8)
+            spacing: dp(8)
+
+        #Texte (Nom de la catégorie)
+        MDLabel:
+            text: root.nom
+            theme_text_color: "Custom"
+            text_color: app.custom_colors[app.theme_cls.theme_style]["text"]
+            font_size: "15dp"   # surcharge fine
+            #font_style: "H6"
+            pos_hint: {"center_y": .5}
+            halign:'left'
+            #padding: dp(12)
+            #spacing: dp(12)
+
+        #Icone 'Supprimer'
+        MDIconButton:
+            icon: "trash-can-outline"
+            theme_text_color: "Custom"
+            text_color: 1,0.5,0.5,1
+            md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_primary"]
+            pos_hint: {"center_y": .5}
+            on_release : root.supprimer_categorie()
+
+#--- Classe pour mes selecteur (icons et couleurs)
+<selecteur@MDBoxLayout>
+    # Propriété personnalisable
+    id_selecteur : id
+    icon_selecteur : ''
+    couleur_bg : 1, 1, 1, 1
+    selecteur: root.select()
+    nom_selecteur: ''
+
+    # Propriétés de MDBoxLayout
+    orientation: 'vertical'
+    #padding:dp(20)
+    spacing: dp(10)     # Espace entre l'icon et mon label
+    adaptive_size: True
+
+    # Selecteur
+    MDIconButton:
+        id: root.id_selecteur
+        icon: root.icon_selecteur
+        md_bg_color: root.couleur_bg
+        theme_icon_color : 'custom'
+        icon_color: 1, 1, 1, 1
+        on_release: selecteur
+        #padding:dp(20)
+        pos_hint: {"center_x": .5}
+
+    # Label pour spécifier le selecteur
+    MDLabel:
+        text: root.nom_selecteur
+        font_style: "Caption"
+        halign: "center"
+        adaptive_height: True
+
+#####################################################################
+# 2. LA BOITE DE DIALOGUE POUR AJOUTER UNE NOUVELLE CATÉGORIE       #
+#####################################################################
+<Contenu_Dialog>
+    #Les propriétés pour la structure de notre contenu
+    orientation: 'vertical'
+    #padding: dp(0)
+    #spacing: dp(20)
+    adaptive_height: True
+
+
+   # Zone de Texte pour saisir le nom de la catégorie que l'on souhaite ajouter
+    MDTextField:
+        id: nom_categorie
+        hint_text: 'Nom de la catégorie'
+        mode: 'line'
+
+    # Boite pour mes selecteur (couleur et icon)
+    MDBoxLayout:
+        orientation: 'horizontal'
+        spacing: dp(20)
+        adaptive_height: True
+        pos_hint: {"center_x": .5}
+
+        # Selecteur de couleur
+        MDBoxLayout:
+            orientation: 'vertical'
+            #padding:dp(20)
+            spacing: dp(10)     # Espace entre l'icon et mon label
+            adaptive_size: True
+
+            # Selecteur
+            MDIconButton:
+                id: btn_couleur
+                icon: 'palette'
+                md_bg_color: root.couleur
+                theme_icon_color : 'Custom'
+                icon_color: 1, 1, 1, 1
+                on_release: root.selecteur_couleur()
+                #padding:dp(20)
+                pos_hint: {"center_x": .5}
+
+            # Label pour spécifier le selecteur
+            MDLabel:
+                text: 'Couleur'
+                font_style: "Caption"
+                halign: "center"
+                adaptive_height: True
+
+
+        # Selecteur d'icon
+        MDBoxLayout:
+            orientation: 'vertical'
+            #padding:dp(20)
+            spacing: dp(10)     # Espace entre l'icon et mon label
+            adaptive_size: True
+
+            # Selecteur
+            MDIconButton:
+                id: btn_icon
+                icon: root.icon_choisie
+                md_bg_color: app.theme_cls.primary_color
+                theme_icon_color : 'Custom'
+                icon_color: 1, 1, 1, 1
+                on_release: root.selecteur_icon()
+                #padding:dp(20)
+                pos_hint: {"center_x": .5}
+
+            # Label pour spécifier le selecteur
+            MDLabel:
+                text: 'Icon'
+                font_style: "Caption"
+                halign: "center"
+                adaptive_height: True
+
+
+
+
+
+
+
+
+############################################
+# 3. L'ÉCRAN PRINCIPAL DE NOTRE PAGE       #
+############################################
+
+<CategorieScreen>
+    orientation: "vertical"
+    #spacing: dp(20)
+    #padding: dp(10)
+
+    Header :
+        title: "Catégories"
+        subtitle: "Gérer vos différentes catégories"
+
+
+    MDFillRoundFlatIconButton:          # MDRectangleFlatIconButton
+        text: "Ajouter une catégorie"
+        icon : "plus"
+
+        size_hint_x: 1
+        #radius: [2, 2, 2, 2]
+        height: dp(48)
+        #icon_size: "24dp"
+
+        md_bg_color: app.custom_colors[app.theme_cls.theme_style]["accent"]
+        text_color: 1, 1, 1, 1
+        elevation : 0.5
+
+        on_release: root.ouvrir_dialogue()
+
+    MDScrollView:
+        do_scroll_x : False
+
+        MDBoxLayout :
+            orientation : "vertical"
+            adaptive_height: True
+            padding: dp(12)
+            spacing: dp(8)
+            id: box_categories
+
+            # Exemples (ces exemples s'affichent seulement si les données ne sont pas gérées dynamiquement )
+            Categorie_Card :
+                nom : "Alimentation"
+                icon: "food"
+                couleur: 0.2,0.8,0.2,1
+
+            Categorie_Card :
+                nom : "Transport"
+                icon: "car"
+                couleur: 0.2,0.2,0.8,1

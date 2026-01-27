@@ -1,0 +1,268 @@
+<PrefItem>:
+    orientation: 'horizontal'
+    adaptive_height: True
+    padding: [dp(20), dp(15)]
+    spacing: dp(15)
+    # MODIFICATION : Background 1 (bg_primary)
+    md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_primary"]
+    elevation: 0
+    radius: [0]
+    ripple_behavior: True
+
+    MDIcon:
+        icon: root.icon
+        theme_text_color: "Custom"
+        text_color: root.icon_color
+        pos_hint: {"center_y": .5}
+        font_size: "24sp"
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        adaptive_height: True
+        pos_hint: {"center_y": .5}
+        spacing: dp(5)
+
+        MDLabel:
+            text: root.text
+            font_style: "Subtitle1"
+            # MODIFICATION : Couleur de texte personnalisée
+            theme_text_color: "Custom"
+            text_color: app.custom_colors[app.theme_cls.theme_style]["text"]
+            adaptive_height: True
+
+        MDLabel:
+            text: root.secondary_text
+            font_style: "Caption"
+            theme_text_color: "Secondary"
+            adaptive_height: True
+
+    MDIcon:
+        icon: root.tertiary_icon
+        theme_text_color: "Secondary"
+        pos_hint: {"center_y": .5}
+        font_size: "20sp"
+
+
+<PrefSwitchItem>:
+    orientation: 'horizontal'
+    adaptive_height: True
+    padding: [dp(20), dp(15)]
+    spacing: dp(15)
+    # MODIFICATION : Background 1 (bg_primary)
+    md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_primary"]
+    elevation: 0
+    radius: [0]
+    ripple_behavior: True
+
+    MDIcon:
+        icon: root.icon
+        theme_text_color: "Custom"
+        text_color: root.icon_color
+        pos_hint: {"center_y": .5}
+        font_size: "24sp"
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        adaptive_height: True
+        spacing: dp(20)
+        pos_hint: {"center_y": .5}
+
+        MDLabel:
+            text: root.text
+            font_style: "Subtitle1"
+            #bold: True
+            # MODIFICATION : Texte principal personnalisé
+            theme_text_color: "Custom"
+            text_color: app.custom_colors[app.theme_cls.theme_style]["text"]
+
+        MDLabel:
+            text: "Activé" if sw.active else "Désactivé"
+            font_style: "Caption"
+            theme_text_color: "Secondary"
+
+    MDBoxLayout:
+        adaptive_width: True
+        padding : dp(15)
+        spacing:  dp(5)
+
+        # On ajoute un widget vide pour pousser le switch vers la droite
+        #MDWidget:
+         #   md_bg_color: 1, 1, 0.3, 1
+
+        MDSwitch:
+            id: sw
+            active: root.active
+            pos_hint: {"center_y": .5}
+
+            # MODIFICATION : Palette boutons (accent)
+            thumb_color_active: app.custom_colors[app.theme_cls.theme_style]["text"]
+            track_color_active: app.custom_colors[app.theme_cls.theme_style]["accent"]
+            on_active: root.on_switch_active(*args)
+
+
+
+
+<ParametreScreen>:
+    orientation: 'vertical'
+    # MODIFICATION : Fond de l'écran principal (Background 2 / bg_secondary)
+    md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_secondary"]
+    spacing: dp(15)
+
+    Header:
+        title: 'Paramètres'
+        subtitle: "Configurer l'application"
+
+    MDScrollView:
+        do_scroll_x: False
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            adaptive_height: True
+            spacing: dp(15)
+            padding : dp(10)
+
+            MDLabel:
+                text: "Apparence"
+                font_style: "Subtitle1"
+                # MODIFICATION : Couleur de texte personnalisée
+                theme_text_color: "Custom"
+                text_color: app.custom_colors[app.theme_cls.theme_style]["text"]
+
+            PrefSwitchItem:
+                text: "Mode sombre"
+                icon: "weather-sunny"
+                # MODIFICATION : L'icône peut aussi suivre la couleur Accent
+                icon_color: app.custom_colors[app.theme_cls.theme_style]["accent"]
+                active: app.theme_cls.theme_style == "Dark"
+
+            MDSeparator:
+
+            MDLabel:
+                text: "Exportation"
+                font_style: "Subtitle1"
+                theme_text_color: "Custom"
+                text_color: app.custom_colors[app.theme_cls.theme_style]["text"]
+
+            MDBoxLayout:
+                orientation: 'vertical'
+                spacing: dp(0)
+                adaptive_height: True
+
+                PrefItem:
+                    text: "Exporter en CSV"
+                    secondary_text: "Toutes les transactions"
+                    icon: "file-download-outline"
+                    icon_color: 0.1, 0.7, 0.3, 1
+                    on_release: root.on_export_csv()
+
+                MDSeparator:
+
+                PrefItem:
+                    text: "Exporter en JSON"
+                    secondary_text: "Données complètes"
+                    icon: "file-code-outline"
+                    icon_color: 0.1, 0.4, 0.8, 1
+                    on_release: root.on_export_json()
+
+        #Configuration
+
+            MDSeparator:
+
+            MDLabel:
+                text: "Configuration"
+                font_style: "Subtitle1"
+                theme_text_color: "Custom"
+                text_color: app.custom_colors[app.theme_cls.theme_style]["text"]
+
+            MDBoxLayout:
+                orientation: 'vertical'
+                spacing: dp(0)
+                adaptive_height: True
+
+                PrefItem:
+                    text: "Définir un nouveau budget"
+                    secondary_text: "Configurer vos limites de dépenses"
+                    icon: "wallet-plus-outline"
+                    icon_color: 0.1, 0.7, 0.3, 1
+                    on_release: root.on_definir_budget()
+
+                MDSeparator:
+
+                PrefItem:
+                    text: "Modifier le de passe"
+                    secondary_text: "Changer votre mot de passe"
+                    icon: "key-variant"
+                    icon_color: 0.1, 0.4, 0.8, 1
+                    on_release: root.on_modifier_mot_de_passe()
+
+                MDSeparator:
+
+                PrefItem:
+                    text: "Réinitialiser l'application"
+                    secondary_text: "Effacer toutes les données"
+                    icon: "file-document-remove"
+                    icon_color: 0.1, 0.4, 0.8, 1
+                    on_release: root.demander_confirmation_reinitialisation()
+
+            MDSeparator:
+
+            MDLabel:
+                text: "À propos"
+                font_style: "Subtitle1"
+                theme_text_color: "Custom"
+                text_color: app.custom_colors[app.theme_cls.theme_style]["text"]
+
+            MDBoxLayout:
+                orientation: 'vertical'
+                adaptive_height: True
+                spacing: dp(0)
+
+                PrefItem:
+                    text: "MonBudget"
+                    secondary_text: "Application de gestion de budget"
+                    icon: "information-outline"
+                    icon_color: app.custom_colors[app.theme_cls.theme_style]["accent"]
+                    on_release: root.on_afficher_a_propos()
+
+                MDSeparator:
+
+                MDBoxLayout:
+                    orientation: 'horizontal'
+                    adaptive_height: True
+                    padding: [dp(20), dp(15)]
+                    # MODIFICATION : Background 1
+                    md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_primary"]
+
+                    MDLabel:
+                        text: "Version"
+                        theme_text_color: "Custom"
+                        text_color: app.custom_colors[app.theme_cls.theme_style]["text"]
+
+                    MDLabel:
+                        text: "1.0.0"
+                        halign: "right"
+                        theme_text_color: "Secondary"
+
+            MDCard:
+                orientation: 'vertical'
+                adaptive_height: True
+                padding: dp(10)
+                spacing: dp(5)
+                radius: [0]
+                # MODIFICATION : Background 1
+                md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_primary"]
+
+                MDLabel:
+                    text: 'Développé avec Material Design 3'
+                    halign: 'center'
+                    font_style: "Caption"
+                    theme_text_color: "Secondary"
+                    adaptive_height: True
+
+                MDLabel:
+                    text: '2026 MonBudget. Tous droits réservés'
+                    halign: 'center'
+                    font_style: "Caption"
+                    theme_text_color: "Secondary"
+                    adaptive_height: True
+
