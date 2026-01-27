@@ -37,11 +37,11 @@ class BudgetScreen(MDBoxLayout):
 
 #cette partie vas nous permettre de rendre le calcule du montan restant, pourcentage, et depenses journalières plus facile
     def on_budget_total(self, instance, value):
-        self.budget_total_formate = self.format_montant(value)
+        self.budget_total_formate = self.format_montant_avec_fc(value)
         self.recalculer_depenses()
 
     def on_montant_utilise(self, instance, value):
-        self.montant_utilise_formate = self.format_montant(value)
+        self.montant_utilise_formate = self.format_montant_avec_fc(value)
         self.recalculer_depenses()
 
     def on_jours_restants(self, instance, value):
@@ -99,8 +99,8 @@ class BudgetScreen(MDBoxLayout):
         self.depenses_journalieres = self.calculer_argent_par_jour_reel()
         
         # Mettre à jour les propriétés formatées
-        self.montant_restant_formate = self.format_montant(self.montant_restant)
-        self.depenses_journalieres_formate = self.format_montant(self.depenses_journalieres)
+        self.montant_restant_formate = self.format_montant_avec_fc(self.montant_restant)
+        self.depenses_journalieres_formate = self.format_montant(self.depenses_journalieres)  # Sans FC
 
 
     def __init__(self, **kwargs):
