@@ -183,5 +183,26 @@
                         
                         MDLabel:
                             text: "Jours"
+
                             font_style : "Caption"
-                            
+    MDBoxLayout :
+        spacing : "5dp"
+        padding : "5dp"
+        adaptive_height: True
+
+        MDFillRoundFlatIconButton:
+            text: "Resumé"
+            icon : "account-voice"
+            #icon : "volume-high"
+
+
+            size_hint_x: 1
+            #radius: [2, 2, 2, 2]
+            height: dp(48)
+            #icon_size: "24dp"
+
+            md_bg_color: app.custom_colors[app.theme_cls.theme_style]["accent"]
+            text_color: 1, 1, 1, 1
+            elevation : 0.5
+
+            #on_release: root.modifier_budget()
