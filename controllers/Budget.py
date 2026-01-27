@@ -13,6 +13,7 @@ from models.transaction import TransactionModel
 from models.budget import BudgetModel
 from data.connexion_bdd import get_default_account_id
 from utils.event_bus import event_bus, EventTypes, subscribe_to_data_changes, notify_budget_changed
+from utils.voice_summary import VoiceSummary
 
 # PAGE 'BUDGET'
 class BudgetScreen(MDBoxLayout):
@@ -32,7 +33,7 @@ class BudgetScreen(MDBoxLayout):
     budget_total_formate = StringProperty("60 000 FC")
     montant_utilise_formate = StringProperty("0 FC")
     montant_restant_formate = StringProperty("60 000 FC")
-    depenses_journalieres_formate = StringProperty("3 000 FC")
+    depenses_journalieres_formate = StringProperty("3 000")  # Sans FC
 
 #cette partie vas nous permettre de rendre le calcule du montan restant, pourcentage, et depenses journalières plus facile
     def on_budget_total(self, instance, value):
@@ -48,6 +49,15 @@ class BudgetScreen(MDBoxLayout):
 
     def format_montant(self, montant):
         """Formate un montant pour l'affichage : avec décimales si nécessaire, sinon entier"""
+        if montant == int(montant):
+            # Pas de partie décimale, afficher en entier
+            return f"{int(montant):,}"
+        else:
+            # Partie décimale présente, afficher avec 2 décimales
+            return f"{montant:,.2f}"
+    
+    def format_montant_avec_fc(self, montant):
+        """Formate un montant avec FC pour l'affichage principal"""
         if montant == int(montant):
             # Pas de partie décimale, afficher en entier
             return f"{int(montant):,} FC"
@@ -95,6 +105,7 @@ class BudgetScreen(MDBoxLayout):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.voice_summary = VoiceSummary()  # Initialiser la synthèse vocale
         self.charger_donnees_depuis_bdd()  # Charger les données depuis la BDD
         self.recalculer_depenses()  # Calcul initial dès le départ
         # S'abonner aux événements pour le rafraîchissement automatique
@@ -251,6 +262,33 @@ class BudgetScreen(MDBoxLayout):
             app.root.notifier(message, type)
 
     # FONCTION POUR RÉINITIALISER LE BUDGET
+    def afficher_resume_vocal(self):
+        """Affiche le popup de résumé vocal du budget"""
+        try:
+            # Préparer les données pour le résumé
+            budget_data = {
+                'budget_total': self.budget_total,
+                'montant_utilise': self.montant_utilise,
+                'montant_restant': self.montant_restant,
+                'pourcentage_utilise': self.pourcentage_utilise,
+                'depenses_journalieres': self.depenses_journalieres,
+                'jours_restants': self.jours_restants
+            }
+            
+            # Créer et afficher le popup
+            dialog = self.voice_summary.create_summary_popup(
+                budget_data, 
+                on_close=self._on_voice_summary_closed
+            )
+            dialog.open()
+            
+        except Exception as e:
+            self.notifier(f"Erreur lors de l'ouverture du résumé vocal: {e}", "error")
+    
+    def _on_voice_summary_closed(self):
+        """Callback appelé à la fermeture du popup de résumé vocal"""
+        pass  # Nettoyage supplémentaire si nécessaire
+
     def reinitialiser_budget(self):
         # Sauvegarder dans la BDD
         id_compte = get_default_account_id()
