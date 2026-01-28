@@ -243,6 +243,13 @@
                         halign: "right"
                         theme_text_color: "Secondary"
 
+                PrefItem:
+                    text: "Se déconnecter"
+                    secondary_text: "Retourner à l'écran de connexion"
+                    icon: "logout"
+                    icon_color: 0.9, 0.2, 0.2, 1
+                    on_release: app.root.current = "login_screen"
+
             MDCard:
                 orientation: 'vertical'
                 adaptive_height: True

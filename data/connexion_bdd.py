@@ -31,7 +31,7 @@ def init_default_user_and_account():
         cursor.execute("""
             INSERT INTO Utilisateur (email, mot_de_passe)
             VALUES (?, ?)
-        """, ("default@monbudget.app", "default_password"))
+        """, ("default@monbudget.app", "0000"))
         user_id = cursor.lastrowid
         
         # Créer le compte par défaut
