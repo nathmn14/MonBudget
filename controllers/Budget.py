@@ -157,9 +157,11 @@ class BudgetScreen(MDBoxLayout):
             # Si Revenus > Dépenses, montant_utilise sera négatif, donc budget_restant (total - utilise) augmentera.
             self.montant_utilise = montant_depenses - montant_revenus
             
-            # Mettre à jour les propriétés formatées
-            self.budget_total_formate = self.format_montant(self.budget_total)
-            self.montant_utilise_formate = self.format_montant(self.montant_utilise)
+            # Mettre à jour les propriétés formatées avec les bonnes méthodes
+            self.budget_total_formate = self.format_montant_avec_fc(self.budget_total)
+            self.montant_utilise_formate = self.format_montant_avec_fc(self.montant_utilise)
+            self.montant_restant_formate = self.format_montant_avec_fc(self.montant_restant)
+            self.depenses_journalieres_formate = self.format_montant(self.depenses_journalieres)  # Sans FC
 
     # CRÉATION D'UNE BOITE DE DIALOGUE POUR MODIFIER LE BUDGET
     popup = None
