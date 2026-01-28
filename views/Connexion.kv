@@ -1,8 +1,7 @@
 <KeyButton@MDCard>:
     digit: ""
-    # On demande au manager d'écran (app.root) de trouver l'écran actuel
-    # et d'appeler sa fonction add_digit
-    on_release: app.root.current_screen.add_digit(root.digit)
+    # On cible explicitement l'écran de connexion pour éviter les erreurs lors de la transition
+    on_release: app.root.get_screen('login_screen').add_digit(root.digit)
     size_hint: None, None
     size: "80dp", "70dp"
     elevation: 1
@@ -61,11 +60,19 @@
                     bold: True
                     theme_text_color: "Primary"
 
+                Widget:
+                    size_hint_y: None
+                    height: dp(10)
+
                 MDLabel:
                     text: "Sécurité"
                     halign: "center"
                     font_style: "Subtitle2"
                     theme_text_color: "Secondary"
+
+                Widget:
+                    size_hint_y: None
+                    height: dp(10)
 
                 MDLabel:
                     id: change_pwd_label

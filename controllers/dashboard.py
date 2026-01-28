@@ -95,13 +95,21 @@ from kivy.uix.widget import Widget
 import math
 class PieChart(Widget):
     data = ListProperty([]) # Liste de dict: {'total': float, 'couleur': tuple, 'nom': str}
+    _last_data = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.bind(pos=self.draw, size=self.draw, data=self.draw)
 
     def draw(self, *args):
+        # Optimisation : éviter de redessiner si les données ET la taille n'ont pas changé
+        if self.data == self._last_data and hasattr(self, '_last_size') and self.size == self._last_size:
+            return
+            
         self.canvas.clear()
+        self._last_data = list(self.data)
+        self._last_size = tuple(self.size)
+
         if not self.data:
             with self.canvas:
                 Color(0.9, 0.9, 0.9, 1)

@@ -176,12 +176,19 @@ class TransacAddScreen(MDScreen):
             
             date_str = self.ids.date_transac.text
             
-            # Conversion de la date pour la BDD (DD/MM/YYYY -> YYYY-MM-DD)
+            # Conversion de la date pour la BDD (DD/MM/YYYY -> YYYY-MM-DD HH:MM:S)
             try:
+                # On récupère l'heure actuelle pour garder l'ordre précis d'ajout
+                now = datetime.now()
                 date_obj = datetime.strptime(date_str, "%d/%m/%Y")
-                date_bdd = date_obj.strftime("%Y-%m-%d")
+                # On combine la date saisie avec l'heure actuelle
+                date_bdd = date_obj.replace(
+                    hour=now.hour, 
+                    minute=now.minute, 
+                    second=now.second
+                ).strftime("%Y-%m-%d %H:%M:%S")
             except:
-                date_bdd = datetime.now().strftime("%Y-%m-%d")
+                date_bdd = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
             # Validation : montant doit être > 0
             if montant <= 0:
@@ -437,120 +444,73 @@ class TransacScreen(MDScreen):
         self.afficher_transactions(self.repertoire_transactions)
     
     # RECHARGER LES TRANSACTIONS DEPUIS LA BDD
-    def recharger_transactions(self):
+    def recharger_transactions(self, *args):
         """Recharge les transactions depuis la base de données et rafraîchit l'affichage"""
-        # CRITICAL: Recharger AUSSI le dictionnaire des catégories pour éviter KeyError
+        # 1. Recharger les catégories pour assurer la synchronisation des icônes/couleurs
         categories = CategorieModel.get_all()
         self.dictionnaire_categories = {}
         for cat in categories:
-            couleur_tuple = tuple(float(x) for x in cat['couleur'].split(','))
-            self.dictionnaire_categories[cat['nom_categorie']] = [cat['icone'], couleur_tuple]
+            couleur_vals = cat['couleur'].split(',')
+            if len(couleur_vals) == 4:
+                couleur_tuple = tuple(float(x) for x in couleur_vals)
+                self.dictionnaire_categories[cat['nom_categorie']] = [cat['icone'], couleur_tuple]
         
         self.list_categories = ['Toutes'] + [cat['nom_categorie'] for cat in categories]
 
-        # Charger les transactions depuis la BDD
+        # 2. Charger les transactions depuis la BDD (déjà triées par id_transaction DESC)
         id_compte = get_default_account_id()
         transactions_bdd = TransactionModel.get_by_account(id_compte) if id_compte else []
         
-        # Convertir les transactions BDD en format dict pour affichage
+        # 3. Convertir les transactions BDD en format dict pour l'affichage
         self.repertoire_transactions = {}
         for i, trans in enumerate(transactions_bdd, 1):
-            # Récupérer la catégorie
-            cat = CategorieModel.get_by_id(trans['id_categorie'])
-            cat_nom = cat['nom_categorie'] if cat else 'Inconnu'
+            cat_nom = trans.get('nom_categorie', 'Inconnue')
             
-            # Extraire le mois de la date
+            # Extraire et formater la date
             date_str = trans['date_transaction']
             try:
+                # On essaie le format avec heure
                 date_obj = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
-                # Utiliser le nom du mois en français si possible, sinon garder datetime.strftime
-                mois = date_obj.strftime('%B')  # Nom du mois en anglais
                 mois = date_obj.strftime('%B')
                 date_formatee = date_obj.strftime('%d %B %Y')
             except:
-                mois = 'Inconnu'
-                date_formatee = date_str
-            
-            type_display = 'Revenu' if trans['type_transaction'] == 'ENTREE' else 'Dépense'
+                # Fallback format simple
+                try:
+                    date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+                    mois = date_obj.strftime('%B')
+                    date_formatee = date_obj.strftime('%d %B %Y')
+                except:
+                    mois = 'Inconnu'
+                    date_formatee = date_str
             
             self.repertoire_transactions[i] = {
                 'id': trans['id_transaction'],
                 'nom': trans['description'],
                 'categorie': cat_nom,
                 'montant': trans['montant'],
-                'type': type_display,
+                'type': 'Revenu' if trans['type_transaction'] == 'ENTREE' else 'Dépense',
                 'date': date_formatee,
-                'mois': mois
+                'mois': mois,
+                'icon': trans.get('icone_categorie', 'help-circle')
             }
         
-        # Rafraîchir l'affichage
+        # 4. Rafraîchir l'affichage
         self.afficher_transactions(self.repertoire_transactions)
         
-        # Réinitialiser les filtres
-        self.ids.barre_recherche.text = ''
-        self.ids.menu_categories.text = 'Toutes'
-        self.ids.menu_mois.text = 'Tous'
+        # 5. Réinitialiser les visuels des filtres (mais pas forcément la logique si l'utilisateur cherche)
+        if hasattr(self.ids, 'barre_recherche') and not self.ids.barre_recherche.focus:
+            self.ids.barre_recherche.text = ''
+            self.ids.menu_categories.text = 'Toutes'
+            self.ids.menu_mois.text = 'Tous'
 
     def _setup_event_listeners(self):
         """Configure les écouteurs d'événements pour le rafraîchissement automatique"""
-        # S'abonner à tous les changements de données
-        subscribe_to_data_changes(self._on_data_changed)
-        
         # S'abonner spécifiquement aux changements de transactions
-        event_bus.subscribe(EventTypes.TRANSACTION_ADDED, self._on_data_changed)
-        event_bus.subscribe(EventTypes.TRANSACTION_DELETED, self._on_data_changed)
-        
-        # S'abonner à la réinitialisation des données
-        event_bus.subscribe(EventTypes.DATA_RESET, self._on_data_changed)
-
-    def _on_data_changed(self, event_data=None, *args, **kwargs):
-        """Callback appelé quand les données changent"""
-        # Rafraîchir les transactions avec un petit délai pour éviter les conflits
-        Clock.schedule_once(lambda dt: self.recharger_transactions(), 0.1)
-
-    def recharger_transactions(self):
-        """Recharge les transactions depuis la BDD et rafraîchit l'affichage"""
-        id_compte = get_default_account_id()
-        transactions_bdd = TransactionModel.get_by_account(id_compte) if id_compte else []
-        
-        # Convertir les transactions BDD en format dict pour affichage
-        self.repertoire_transactions = {}
-        for i, trans in enumerate(transactions_bdd, 1):
-            # Récupérer la catégorie directement depuis les données de la transaction
-            cat_nom = trans.get('nom_categorie', 'Inconnue')
-            cat_icone = trans.get('icone_categorie', 'help-circle')
-            
-            # Si la catégorie n'existe pas dans notre dictionnaire, l'ajouter
-            if cat_nom not in self.dictionnaire_categories and cat_nom != 'Inconnue':
-                cat_couleur = trans.get('couleur_categorie', '0.5,0.5,0.5,1')
-                couleur_tuple = tuple(float(x) for x in cat_couleur.split(','))
-                self.dictionnaire_categories[cat_nom] = [cat_icone, couleur_tuple]
-            
-            # Extraire le mois de la date
-            date_str = trans['date_transaction']
-            try:
-                date_obj = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
-                # Utiliser le nom du mois en français si possible, sinon garder datetime.strftime
-                mois = date_obj.strftime('%B')
-                date_formatee = date_obj.strftime('%d %B %Y')
-            except:
-                mois = 'Inconnu'
-                date_formatee = date_str
-            
-            type_display = 'Revenu' if trans['type_transaction'] == 'ENTREE' else 'Dépense'
-            
-            self.repertoire_transactions[i] = {
-                'id': trans['id_transaction'],
-                'nom': trans['description'],
-                'categorie': cat_nom,
-                'montant': trans['montant'],
-                'type': type_display,
-                'date': date_formatee,
-                'mois': mois
-            }
-        
-        # Rafraîchir l'affichage
-        self.afficher_transactions(self.repertoire_transactions)
+        event_bus.subscribe(EventTypes.TRANSACTION_ADDED, self.recharger_transactions)
+        event_bus.subscribe(EventTypes.TRANSACTION_DELETED, self.recharger_transactions)
+        event_bus.subscribe(EventTypes.DATA_RESET, self.recharger_transactions)
+        # S'abonner aux changements de catégorie (couleurs/icônes)
+        event_bus.subscribe(EventTypes.CATEGORY_CHANGED, self.recharger_transactions)
 
 
 

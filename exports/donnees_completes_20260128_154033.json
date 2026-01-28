@@ -1,0 +1,499 @@
+{
+  "export_date": "2026-01-28T15:40:33.707627",
+  "transactions": [
+    {
+      "id_transaction": 66,
+      "id_compte": 1,
+      "id_categorie": 25,
+      "montant": 500.0,
+      "type_transaction": "SORTIE",
+      "description": "Alimentation",
+      "date_transaction": "2026-01-28 14:32:46",
+      "date_creation": "2026-01-28 13:32:46",
+      "date_modification": "2026-01-28 13:32:46"
+    },
+    {
+      "id_transaction": 65,
+      "id_compte": 1,
+      "id_categorie": 25,
+      "montant": 500.0,
+      "type_transaction": "SORTIE",
+      "description": "Départ",
+      "date_transaction": "2026-01-28 03:18:56",
+      "date_creation": "2026-01-28 02:18:56",
+      "date_modification": "2026-01-28 02:18:56"
+    },
+    {
+      "id_transaction": 64,
+      "id_compte": 1,
+      "id_categorie": 15,
+      "montant": 2000.0,
+      "type_transaction": "ENTREE",
+      "description": "Revenir",
+      "date_transaction": "2026-01-28 03:16:08",
+      "date_creation": "2026-01-28 02:16:08",
+      "date_modification": "2026-01-28 02:16:08"
+    },
+    {
+      "id_transaction": 63,
+      "id_compte": 1,
+      "id_categorie": 15,
+      "montant": 20000.0,
+      "type_transaction": "ENTREE",
+      "description": "Salaire",
+      "date_transaction": "2026-01-28 03:12:01",
+      "date_creation": "2026-01-28 02:12:01",
+      "date_modification": "2026-01-28 02:12:01"
+    },
+    {
+      "id_transaction": 62,
+      "id_compte": 1,
+      "id_categorie": 11,
+      "montant": 2000.0,
+      "type_transaction": "SORTIE",
+      "description": "Dépenses",
+      "date_transaction": "2026-01-28 03:06:51",
+      "date_creation": "2026-01-28 02:06:51",
+      "date_modification": "2026-01-28 02:06:51"
+    },
+    {
+      "id_transaction": 61,
+      "id_compte": 1,
+      "id_categorie": 15,
+      "montant": 500.0,
+      "type_transaction": "ENTREE",
+      "description": "Jour s",
+      "date_transaction": "2026-01-28 03:05:55",
+      "date_creation": "2026-01-28 02:05:55",
+      "date_modification": "2026-01-28 02:05:55"
+    },
+    {
+      "id_transaction": 60,
+      "id_compte": 1,
+      "id_categorie": 27,
+      "montant": 507.0,
+      "type_transaction": "SORTIE",
+      "description": "Divers",
+      "date_transaction": "2026-01-28 03:05:27",
+      "date_creation": "2026-01-28 02:05:27",
+      "date_modification": "2026-01-28 02:05:27"
+    },
+    {
+      "id_transaction": 59,
+      "id_compte": 1,
+      "id_categorie": 15,
+      "montant": 3000.0,
+      "type_transaction": "ENTREE",
+      "description": "Ajoute",
+      "date_transaction": "2026-01-28 03:00:50",
+      "date_creation": "2026-01-28 02:00:50",
+      "date_modification": "2026-01-28 02:00:50"
+    },
+    {
+      "id_transaction": 58,
+      "id_compte": 1,
+      "id_categorie": 15,
+      "montant": 15000.0,
+      "type_transaction": "ENTREE",
+      "description": "Ajoute",
+      "date_transaction": "2026-01-28 02:58:26",
+      "date_creation": "2026-01-28 01:58:26",
+      "date_modification": "2026-01-28 01:58:26"
+    },
+    {
+      "id_transaction": 57,
+      "id_compte": 1,
+      "id_categorie": 15,
+      "montant": 10000.0,
+      "type_transaction": "ENTREE",
+      "description": "Joue",
+      "date_transaction": "2026-01-28 02:58:05",
+      "date_creation": "2026-01-28 01:58:05",
+      "date_modification": "2026-01-28 01:58:05"
+    },
+    {
+      "id_transaction": 56,
+      "id_compte": 1,
+      "id_categorie": 15,
+      "montant": 10000.0,
+      "type_transaction": "ENTREE",
+      "description": "Ajoute",
+      "date_transaction": "2026-01-28 02:54:39",
+      "date_creation": "2026-01-28 01:54:39",
+      "date_modification": "2026-01-28 01:54:39"
+    },
+    {
+      "id_transaction": 55,
+      "id_compte": 1,
+      "id_categorie": 26,
+      "montant": 10000.0,
+      "type_transaction": "SORTIE",
+      "description": "Avenue salers",
+      "date_transaction": "2026-01-28 02:54:10",
+      "date_creation": "2026-01-28 01:54:10",
+      "date_modification": "2026-01-28 01:54:10"
+    },
+    {
+      "id_transaction": 54,
+      "id_compte": 1,
+      "id_categorie": 15,
+      "montant": 10000.0,
+      "type_transaction": "ENTREE",
+      "description": "Salaire",
+      "date_transaction": "2026-01-28 02:52:17",
+      "date_creation": "2026-01-28 01:52:17",
+      "date_modification": "2026-01-28 01:52:17"
+    },
+    {
+      "id_transaction": 53,
+      "id_compte": 1,
+      "id_categorie": 15,
+      "montant": 10000.0,
+      "type_transaction": "ENTREE",
+      "description": "Salaire",
+      "date_transaction": "2026-01-28 02:52:05",
+      "date_creation": "2026-01-28 01:52:05",
+      "date_modification": "2026-01-28 01:52:05"
+    },
+    {
+      "id_transaction": 52,
+      "id_compte": 1,
+      "id_categorie": 15,
+      "montant": 1000.0,
+      "type_transaction": "ENTREE",
+      "description": "S",
+      "date_transaction": "2026-01-28 02:48:12",
+      "date_creation": "2026-01-28 01:48:12",
+      "date_modification": "2026-01-28 01:48:12"
+    },
+    {
+      "id_transaction": 51,
+      "id_compte": 1,
+      "id_categorie": 25,
+      "montant": 500.0,
+      "type_transaction": "SORTIE",
+      "description": "",
+      "date_transaction": "2026-01-28 02:45:35",
+      "date_creation": "2026-01-28 01:45:35",
+      "date_modification": "2026-01-28 01:45:35"
+    },
+    {
+      "id_transaction": 50,
+      "id_compte": 1,
+      "id_categorie": 24,
+      "montant": 500.0,
+      "type_transaction": "SORTIE",
+      "description": "",
+      "date_transaction": "2026-01-28 02:35:59",
+      "date_creation": "2026-01-28 01:35:59",
+      "date_modification": "2026-01-28 01:35:59"
+    },
+    {
+      "id_transaction": 49,
+      "id_compte": 1,
+      "id_categorie": 23,
+      "montant": 1000.0,
+      "type_transaction": "SORTIE",
+      "description": "Dépenses 1000 frf courants et du quotient",
+      "date_transaction": "2026-01-28 02:30:49",
+      "date_creation": "2026-01-28 01:30:49",
+      "date_modification": "2026-01-28 01:30:49"
+    },
+    {
+      "id_transaction": 48,
+      "id_compte": 1,
+      "id_categorie": 22,
+      "montant": 500.0,
+      "type_transaction": "SORTIE",
+      "description": "Bilbao 500 convoqua le concile",
+      "date_transaction": "2026-01-28 02:29:49",
+      "date_creation": "2026-01-28 01:29:49",
+      "date_modification": "2026-01-28 01:29:49"
+    },
+    {
+      "id_transaction": 47,
+      "id_compte": 1,
+      "id_categorie": 21,
+      "montant": 3000.0,
+      "type_transaction": "SORTIE",
+      "description": "Déclenche 3000 pour incarner",
+      "date_transaction": "2026-01-28 02:26:39",
+      "date_creation": "2026-01-28 01:26:39",
+      "date_modification": "2026-01-28 01:26:39"
+    },
+    {
+      "id_transaction": 46,
+      "id_compte": 1,
+      "id_categorie": 20,
+      "montant": 500.0,
+      "type_transaction": "SORTIE",
+      "description": "Les hanches 500 on pourrait que je",
+      "date_transaction": "2026-01-28 02:26:14",
+      "date_creation": "2026-01-28 01:26:14",
+      "date_modification": "2026-01-28 01:26:14"
+    },
+    {
+      "id_transaction": 45,
+      "id_compte": 1,
+      "id_categorie": 19,
+      "montant": 100000.0,
+      "type_transaction": "SORTIE",
+      "description": "Bihan 100 000 touristes en",
+      "date_transaction": "2026-01-28 02:25:09",
+      "date_creation": "2026-01-28 01:25:09",
+      "date_modification": "2026-01-28 01:25:09"
+    },
+    {
+      "id_transaction": 69,
+      "id_compte": 1,
+      "id_categorie": 4,
+      "montant": 2000.0,
+      "type_transaction": "SORTIE",
+      "description": "Loisirs",
+      "date_transaction": "2026-01-28",
+      "date_creation": "2026-01-28 14:31:25",
+      "date_modification": "2026-01-28 14:31:25"
+    },
+    {
+      "id_transaction": 68,
+      "id_compte": 1,
+      "id_categorie": 25,
+      "montant": 4000.0,
+      "type_transaction": "SORTIE",
+      "description": "Alimentation",
+      "date_transaction": "2026-01-28",
+      "date_creation": "2026-01-28 14:26:07",
+      "date_modification": "2026-01-28 14:26:07"
+    },
+    {
+      "id_transaction": 67,
+      "id_compte": 1,
+      "id_categorie": 25,
+      "montant": 10000.0,
+      "type_transaction": "SORTIE",
+      "description": "Alimentation",
+      "date_transaction": "2026-01-28",
+      "date_creation": "2026-01-28 13:34:10",
+      "date_modification": "2026-01-28 13:34:10"
+    }
+  ],
+  "categories": [
+    {
+      "id_categorie": 27,
+      "nom_categorie": "Divers",
+      "type_transaction": "SORTIE",
+      "icone": "tag",
+      "couleur": "0.18,0.8,0.44,1",
+      "date_creation": "2026-01-28 02:05:27",
+      "date_modification": "2026-01-28 14:40:15"
+    },
+    {
+      "id_categorie": 26,
+      "nom_categorie": "Avenue salers",
+      "type_transaction": "SORTIE",
+      "icone": "tag",
+      "couleur": "0.2,0.6,0.86,1",
+      "date_creation": "2026-01-28 01:54:10",
+      "date_modification": "2026-01-28 14:40:15"
+    },
+    {
+      "id_categorie": 25,
+      "nom_categorie": "Alimentation",
+      "type_transaction": "SORTIE",
+      "icone": "tag",
+      "couleur": "0.9,0.5,0.13,1",
+      "date_creation": "2026-01-28 01:45:35",
+      "date_modification": "2026-01-28 14:40:15"
+    },
+    {
+      "id_categorie": 24,
+      "nom_categorie": "Show animaux que",
+      "type_transaction": "SORTIE",
+      "icone": "tag",
+      "couleur": "0.6,0.3,0.7,1",
+      "date_creation": "2026-01-28 01:35:59",
+      "date_modification": "2026-01-28 14:40:15"
+    },
+    {
+      "id_categorie": 23,
+      "nom_categorie": "Dépenses frf courants quotient",
+      "type_transaction": "SORTIE",
+      "icone": "tag",
+      "couleur": "0.1,0.7,0.7,1",
+      "date_creation": "2026-01-28 01:30:49",
+      "date_modification": "2026-01-28 14:40:15"
+    },
+    {
+      "id_categorie": 22,
+      "nom_categorie": "Bilbao convoqua concile",
+      "type_transaction": "SORTIE",
+      "icone": "tag",
+      "couleur": "0.9,0.3,0.23,1",
+      "date_creation": "2026-01-28 01:29:49",
+      "date_modification": "2026-01-28 14:40:15"
+    },
+    {
+      "id_categorie": 21,
+      "nom_categorie": "Déclenche incarner",
+      "type_transaction": "SORTIE",
+      "icone": "tag",
+      "couleur": "0.44,0.26,0.13,1",
+      "date_creation": "2026-01-28 01:26:39",
+      "date_modification": "2026-01-28 14:40:15"
+    },
+    {
+      "id_categorie": 20,
+      "nom_categorie": "Les hanches pourrait que",
+      "type_transaction": "SORTIE",
+      "icone": "tag",
+      "couleur": "0.95,0.2,0.4,1",
+      "date_creation": "2026-01-28 01:26:14",
+      "date_modification": "2026-01-28 14:40:15"
+    },
+    {
+      "id_categorie": 19,
+      "nom_categorie": "Bihan touristes",
+      "type_transaction": "SORTIE",
+      "icone": "tag",
+      "couleur": "0.1,0.3,0.5,1",
+      "date_creation": "2026-01-28 01:25:09",
+      "date_modification": "2026-01-28 14:40:15"
+    },
+    {
+      "id_categorie": 18,
+      "nom_categorie": "test transac",
+      "type_transaction": "SORTIE",
+      "icone": "school",
+      "couleur": "1,0.8,0.2,1",
+      "date_creation": "2026-01-10 14:22:07",
+      "date_modification": "2026-01-28 14:40:15"
+    },
+    {
+      "id_categorie": 17,
+      "nom_categorie": "test categorie",
+      "type_transaction": "SORTIE",
+      "icone": "hammer-wrench",
+      "couleur": "0.5,0.4,0.3,1",
+      "date_creation": "2026-01-10 13:49:19",
+      "date_modification": "2026-01-28 14:40:15"
+    },
+    {
+      "id_categorie": 16,
+      "nom_categorie": "ananas",
+      "type_transaction": "SORTIE",
+      "icone": "food",
+      "couleur": "0.8,0.1,0.5,1",
+      "date_creation": "2026-01-10 13:18:13",
+      "date_modification": "2026-01-28 14:40:15"
+    },
+    {
+      "id_categorie": 4,
+      "nom_categorie": "Loisirs",
+      "type_transaction": "SORTIE",
+      "icone": "controller-classic",
+      "couleur": "0.1,0.8,0.8,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-28 14:40:16"
+    },
+    {
+      "id_categorie": 5,
+      "nom_categorie": "Courses",
+      "type_transaction": "SORTIE",
+      "icone": "cart",
+      "couleur": "0.5,0.8,0.1,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-28 14:40:16"
+    },
+    {
+      "id_categorie": 6,
+      "nom_categorie": "Telephone",
+      "type_transaction": "SORTIE",
+      "icone": "phone-settings",
+      "couleur": "0.8,0.5,0.1,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-28 14:40:16"
+    },
+    {
+      "id_categorie": 8,
+      "nom_categorie": "Cadeaux",
+      "type_transaction": "SORTIE",
+      "icone": "gift",
+      "couleur": "0.2,0.2,0.6,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-28 14:40:16"
+    },
+    {
+      "id_categorie": 9,
+      "nom_categorie": "Cinéma",
+      "type_transaction": "SORTIE",
+      "icone": "movie",
+      "couleur": "0.6,0.1,0.1,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-28 14:40:16"
+    },
+    {
+      "id_categorie": 10,
+      "nom_categorie": "Etudes",
+      "type_transaction": "SORTIE",
+      "icone": "school",
+      "couleur": "0.1,0.5,0.1,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-28 14:40:16"
+    },
+    {
+      "id_categorie": 11,
+      "nom_categorie": "Santé",
+      "type_transaction": "SORTIE",
+      "icone": "medical-bag",
+      "couleur": "0.5,0.1,0.5,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-28 14:40:16"
+    },
+    {
+      "id_categorie": 12,
+      "nom_categorie": "Business",
+      "type_transaction": "SORTIE",
+      "icone": "trending-up",
+      "couleur": "0.4,0.4,0.4,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-28 14:40:16"
+    },
+    {
+      "id_categorie": 13,
+      "nom_categorie": "Énergie",
+      "type_transaction": "SORTIE",
+      "icone": "lightning-bolt",
+      "couleur": "0.18,0.8,0.44,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-28 14:40:16"
+    },
+    {
+      "id_categorie": 14,
+      "nom_categorie": "Éducation",
+      "type_transaction": "SORTIE",
+      "icone": "book-open-variant",
+      "couleur": "0.2,0.6,0.86,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-28 14:40:16"
+    },
+    {
+      "id_categorie": 15,
+      "nom_categorie": "Salaire",
+      "type_transaction": "ENTREE",
+      "icone": "cash-multiple",
+      "couleur": "0.9,0.5,0.13,1",
+      "date_creation": "2026-01-10 13:17:44",
+      "date_modification": "2026-01-28 14:40:16"
+    }
+  ],
+  "budgets": [
+    {
+      "id_budget": 1,
+      "id_compte": 1,
+      "budget_total": 202000.0,
+      "jours_restants": 20,
+      "date_creation": "2026-01-10 13:45:36",
+      "date_modification": "2026-01-28 02:16:08"
+    }
+  ]
+}

@@ -87,20 +87,23 @@ class VoiceTransaction:
         self._init_tts_engine()
         
     def _init_tts_engine(self):
-        """Initialise le moteur de synthèse vocale uniquement"""
-        if HAS_PYTTSX3:
-            try:
-                self.engine = pyttsx3.init()
-                # Config voix
-                voices = self.engine.getProperty('voices')
-                for voice in voices:
-                    if 'fr' in voice.id.lower() or 'french' in voice.name.lower():
-                        self.engine.setProperty('voice', voice.id)
-                        break
-                self.engine.setProperty('rate', 150)
-                self.engine.setProperty('volume', 0.9)
-            except Exception as e:
-                print(f"Erreur init pyttsx3: {e}")
+        """Initialise le moteur de synthèse vocale dans un thread séparé"""
+        def _target():
+            if HAS_PYTTSX3:
+                try:
+                    self.engine = pyttsx3.init()
+                    # Config voix
+                    voices = self.engine.getProperty('voices')
+                    for voice in voices:
+                        if 'fr' in voice.id.lower() or 'french' in voice.name.lower():
+                            self.engine.setProperty('voice', voice.id)
+                            break
+                    self.engine.setProperty('rate', 150)
+                    self.engine.setProperty('volume', 0.9)
+                except Exception as e:
+                    print(f"Erreur init pyttsx3 (silencieuse): {e}")
+        
+        threading.Thread(target=_target, daemon=True).start()
     
     def create_transaction_popup(self, on_close=None):
         """Crée l'interface utilisateur style Google Assistant"""
@@ -560,12 +563,14 @@ class VoiceTransaction:
         except: pass
 
     def stop_speaking(self):
-        """Arrête la synthèse vocale immédiatement"""
+        """Arrête la synthèse vocale immédiatement et de manière sécurisée"""
         if self.engine:
-            try:
-                self.engine.stop()
-            except:
-                pass
+            def _stop():
+                try:
+                    self.engine.stop()
+                except:
+                    pass
+            threading.Thread(target=_stop, daemon=True).start()
 
     def close_dialog(self, on_close=None):
         # Arrêter de parler dans un thread séparé pour ne pas freezer l'UI

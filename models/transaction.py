@@ -52,7 +52,7 @@ class TransactionModel:
         """
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM "Transaction" ORDER BY date_transaction DESC')
+        cursor.execute('SELECT * FROM "Transaction" ORDER BY date_transaction DESC, id_transaction DESC')
         rows = cursor.fetchall()
         conn.close()
         
@@ -120,7 +120,7 @@ class TransactionModel:
             FROM "Transaction" t
             LEFT JOIN "Categorie" c ON t.id_categorie = c.id_categorie
             WHERE t.id_compte = ? 
-            ORDER BY t.date_transaction DESC
+            ORDER BY t.date_transaction DESC, t.id_transaction DESC
         ''', (id_compte,))
         rows = cursor.fetchall()
         conn.close()
@@ -156,7 +156,7 @@ class TransactionModel:
         """
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM "Transaction" WHERE id_categorie = ? ORDER BY date_transaction DESC', (id_categorie,))
+        cursor.execute('SELECT * FROM "Transaction" WHERE id_categorie = ? ORDER BY date_transaction DESC, id_transaction DESC', (id_categorie,))
         rows = cursor.fetchall()
         conn.close()
         
@@ -192,12 +192,12 @@ class TransactionModel:
         
         if id_compte:
             cursor.execute(
-                'SELECT * FROM "Transaction" WHERE type_transaction = ? AND id_compte = ? ORDER BY date_transaction DESC',
+                'SELECT * FROM "Transaction" WHERE type_transaction = ? AND id_compte = ? ORDER BY date_transaction DESC, id_transaction DESC',
                 (type_transaction, id_compte)
             )
         else:
             cursor.execute(
-                'SELECT * FROM "Transaction" WHERE type_transaction = ? ORDER BY date_transaction DESC',
+                'SELECT * FROM "Transaction" WHERE type_transaction = ? ORDER BY date_transaction DESC, id_transaction DESC',
                 (type_transaction,)
             )
         
@@ -237,12 +237,12 @@ class TransactionModel:
         
         if id_compte:
             cursor.execute(
-                'SELECT * FROM "Transaction" WHERE date_transaction BETWEEN ? AND ? AND id_compte = ? ORDER BY date_transaction DESC',
+                'SELECT * FROM "Transaction" WHERE date_transaction BETWEEN ? AND ? AND id_compte = ? ORDER BY date_transaction DESC, id_transaction DESC',
                 (start_date, end_date, id_compte)
             )
         else:
             cursor.execute(
-                'SELECT * FROM "Transaction" WHERE date_transaction BETWEEN ? AND ? ORDER BY date_transaction DESC',
+                'SELECT * FROM "Transaction" WHERE date_transaction BETWEEN ? AND ? ORDER BY date_transaction DESC, id_transaction DESC',
                 (start_date, end_date)
             )
         
