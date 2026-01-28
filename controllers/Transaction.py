@@ -158,124 +158,103 @@ class TransacAddScreen(MDScreen):
             self.ids.date_transac.text = datetime.now().strftime("%d/%m/%Y")
 
     def ajouter_transaction(self):
-        """Sauvegarde la transaction dans la BDD"""
+        """Sauvegarde instantanée avec injection chirurgicale"""
         try:
-            # Récupérer les données du formulaire
+            # 1. Validation ultra-rapide
             montant_text = self.ids.montant_transac.text
             if not montant_text or montant_text == "0":
-                self.notifier("Veuillez entrer un montant valide.", "error")
+                self.notifier("Montant invalide", "error")
                 return
                 
             montant = float(montant_text)
             categorie_nom = self.ids.menu_categories2.text
-            description = self.ids.description_transac.text.strip()
-            
-            # Si la description est vide, utiliser le nom de la catégorie
-            if not description:
-                description = categorie_nom
-            
+            if categorie_nom == "Sélectionner une catégorie":
+                self.notifier("Choisissez une catégorie", "error")
+                return
+
+            description = self.ids.description_transac.text.strip() or categorie_nom
             date_str = self.ids.date_transac.text
             
-            # Conversion de la date pour la BDD (DD/MM/YYYY -> YYYY-MM-DD HH:MM:S)
-            try:
-                # On récupère l'heure actuelle pour garder l'ordre précis d'ajout
-                now = datetime.now()
-                date_obj = datetime.strptime(date_str, "%d/%m/%Y")
-                # On combine la date saisie avec l'heure actuelle
-                date_bdd = date_obj.replace(
-                    hour=now.hour, 
-                    minute=now.minute, 
-                    second=now.second
-                ).strftime("%Y-%m-%d %H:%M:%S")
-            except:
-                date_bdd = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            
-            # Validation : montant doit être > 0
-            if montant <= 0:
-                self.notifier("Le montant doit être supérieur à 0.", "error")
-                return
-            
-            # Validation : catégorie doit être sélectionnée
-            if categorie_nom == "Sélectionner une catégorie":
-                self.notifier("Veuillez sélectionner une catégorie.", "error")
-                return
-            
-            # Déterminer le type de transaction
-            if self.ids.btn_revenu.md_bg_color == [0.45, 1, 0.35, 1]:
-                type_transaction = 'ENTREE'
-            else:
-                type_transaction = 'SORTIE'
-            
-            # Récupérer l'ID de la catégorie par son nom (rafraîchir avant au cas où)
-            categories = CategorieModel.get_all()
-            id_categorie = None
-            for cat in categories:
-                if cat['nom_categorie'] == categorie_nom:
-                    id_categorie = cat['id_categorie']
-                    break
-            
-            if not id_categorie:
-                self.notifier("Catégorie introuvable dans la base de données.", "error")
-                return
-            
-            # Récupérer l'ID du compte par défaut
-            id_compte = get_default_account_id()
-            
-            # Sauvegarder dans la BDD
-            TransactionModel.create(
-                id_compte=id_compte,
-                id_categorie=id_categorie,
-                montant=montant,
-                type_transaction=type_transaction,
-                description=description,
-                date_transaction=date_bdd
-            )
-            
-            # Message de succès
-            self.notifier(f"Transaction '{description}' ajoutée !", "success")
-            
-            # Notifier que la transaction a été ajoutée
-            transaction_data = {
-                'montant': montant,
-                'type': type_transaction,
-                'description': description,
-                'categorie': categorie_nom
-            }
-            notify_transaction_added(transaction_data)
-            
-            # Réinitialiser les champs
-            self.ids.montant_transac.text = "0"
-            self.ids.description_transac.text = ""
-            self.ids.menu_categories2.text = "Sélectionner une catégorie"
-            
-            # Retourner à l'écran précédent
+            # --- ACTION IMMÉDIATE ---
+            self.parent.transition.direction = 'right'
+            self.parent.transition.duration = 0.15 
             self.parent.current = 'list_screen'
             
-        except ValueError as e:
-            self.notifier(f"Montant invalide : {str(e)}", "error")
+            # --- SAUVEGARDE EN ARRIÈRE-PLAN ---
+            import threading
+            def _task():
+                try:
+                    # Préparation date
+                    try: 
+                        date_obj = datetime.strptime(date_str, "%d/%m/%Y")
+                        date_bdd = date_obj.replace(hour=datetime.now().hour, minute=datetime.now().minute, second=datetime.now().second).strftime("%Y-%m-%d %H:%M:%S")
+                    except: date_bdd = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-# LA CLASSE QUI VA SERVIR DE MODEL POUR CHAQUE TRANSACTION
-class Transaction_card(MDCard):
-    id_transaction = NumericProperty(0)  # ID de la transaction dans la BDD
-    nom_=StringProperty('')
-    type_= OptionProperty("Dépense",options=["Dépense", "Revenu"])
-    montant_= NumericProperty(0)
-    devise=StringProperty('FC')
-    date_= StringProperty('')
-    mois_=StringProperty('')
-    note_= StringProperty('')
-    categorie_=StringProperty('')
-    icon_=StringProperty('')
-    couleur_=ColorProperty([0, 0, 0, 1])
+                    categories = CategorieModel.get_all()
+                    cat_data = next((c for c in categories if c['nom_categorie'] == categorie_nom), None)
+                    if not cat_data: return
+
+                    tid = TransactionModel.create(
+                        id_compte=get_default_account_id(),
+                        id_categorie=cat_data['id_categorie'],
+                        montant=montant,
+                        type_transaction='ENTREE' if self.ids.btn_revenu.md_bg_color == [0.45, 1, 0.35, 1] else 'SORTIE',
+                        description=description,
+                        date_transaction=date_bdd
+                    )
+                    
+                    # Injection dans l'UI sans recharger toute la BDD
+                    def _ui(*args):
+                        new_info = {
+                            'id': tid, 'nom': description, 'categorie': categorie_nom,
+                            'montant': montant, 'type': 'Revenu' if 'ENTREE' in date_bdd or self.ids.btn_revenu.md_bg_color == [0.45, 1, 0.35, 1] else 'Dépense',
+                            'date': datetime.now().strftime("%d %B %Y"), 'mois': datetime.now().strftime("%B"),
+                            'icon': cat_data['icone']
+                        }
+                        notify_transaction_added(new_info)
+                    Clock.schedule_once(_ui, 0.2)
+                except: pass
+
+            threading.Thread(target=_task, daemon=True).start()
+            
+            # Reset UI
+            self.ids.montant_transac.text = "0"
+            self.ids.description_transac.text = ""
+        except Exception as e:
+            self.notifier(f"Erreur: {str(e)}", "error")
+
+from kivy.uix.recycleview.views import RecycleDataViewBehavior
+
+# LA CLASSE QUI VA SERVIR DE MODEL POUR CHAQUE TRANSACTION - OPTIMISÉE POUR RECYCLEVIEW
+class Transaction_card(RecycleDataViewBehavior, MDCard):
+    # Propriétés de données (Mêmes noms que dans le KV pour l'auto-mapping)
+    id_transaction = NumericProperty(0)
+    nom_ = StringProperty('')
+    type_ = OptionProperty("Dépense", options=["Dépense", "Revenu"])
+    montant_ = NumericProperty(0)
+    devise = StringProperty('FC')
+    date_ = StringProperty('')
+    mois_ = StringProperty('')
+    categorie_ = StringProperty('')
+    icon_ = StringProperty('')
+    couleur_ = ColorProperty([0, 0, 0, 1])
+
+    def refresh_view_attrs(self, rv, index, data):
+        """Appelé lorsque le RecycleView réutilise ce widget"""
+        for key, value in data.items():
+            setattr(self, key, value)
+        return super().refresh_view_attrs(rv, index, data)
 
 
 # LA PAGE TRANSACATION
 class TransacScreen(MDScreen):
     # On définit nos propriétés
-    repertoire_transactions=DictProperty()
-    dictionnaire_categories= DictProperty()
-    list_categories= ListProperty()
-    list_mois= ListProperty()
+    repertoire_transactions = DictProperty()
+    dictionnaire_categories = DictProperty()
+    list_categories = ListProperty()
+    list_mois = ListProperty()
+    _refreshing = False # Verrou anti-spam/anti-conflict
+    _search_event = None # Pour le débouclage de la recherche
 
     # On initialise nos propriétés
     def __init__(self,**kwargs):
@@ -337,80 +316,66 @@ class TransacScreen(MDScreen):
             }
         
         self.menu = None
-        Clock.schedule_once(lambda dt: self.afficher_transactions(self.repertoire_transactions))
 
-    # AFFICHAGE DES TRANSACTION (CARD)
+    def on_enter(self, *args):
+        """Chargé à chaque affichage de l'écran"""
+        # S'assurer que les données sont à jour au cas ou
+        self.recharger_transactions()
+
+    # AFFICHAGE DES TRANSACTION (RECYCLEVIEW : ULTRA RAPIDE)
     def afficher_transactions(self, repertoire):
+        """Met à jour les données du RecycleView"""
+        self.ids.nb_transaction.text = f"Nous avons trouvé {len(repertoire)} transaction{'s' if len(repertoire) > 1 else ''}"
+        
+        # Préparation des données pour le RecycleView
+        rv_data = []
+        # On trie les transactions par date (la logique de tri est déjà faite dans recharger_transactions)
+        # Mais on s'assure ici de créer la liste de dicts attendue par RV
+        for id_key, info in repertoire.items():
+            cat = info["categorie"]
+            icon = self.dictionnaire_categories.get(cat, ["help-circle"])[0] if cat in self.dictionnaire_categories else "help-circle"
+            couleur = (0.1, 0.9, 0.3, 1) if info["type"] == 'Revenu' else (0.9, 0.1, 0.1, 1)
 
-        nbr_transaction=len(repertoire)
-        if nbr_transaction <=1:
-            self.ids.nb_transaction.text=f'Nous avons trouvé {nbr_transaction} transaction '
-        else:
-            self.ids.nb_transaction.text=f'Nous avons trouvé {nbr_transaction} transactions '
+            rv_data.append({
+                'icon_': icon,
+                'couleur_': couleur,
+                'nom_': info["nom"],
+                'categorie_': cat,
+                'montant_': info["montant"],
+                'date_': info["date"],
+                'mois_': info["mois"]
+            })
 
-        conteneur_transaction= self.ids.conteneur_transaction
-        conteneur_transaction.clear_widgets()
+        # Mise à jour directe (atomique et instantanée)
+        if hasattr(self.ids, 'rv_transactions'):
+            self.ids.rv_transactions.data = rv_data
 
+    # FILTRER LES TRANSACTION (AVEC DÉBOUCLAGE)
+    def filtrer_transaction(self, *args):
+        # On annule le timer précédent
+        if self._search_event:
+            self._search_event.cancel()
+        
+        # On lance un nouveau timer de 300ms (débouclage)
+        self._search_event = Clock.schedule_once(self._do_filtring, 0.3)
 
-        for id_transac, info_transac in repertoire.items():
-            nom= info_transac["nom"]
-            montant= info_transac["montant"]
-            date= info_transac["date"]
-            mois= info_transac["mois"]
+    def _do_filtring(self, dt):
+        """Exécute réellement la logique de filtrage après le délai de débouclage"""
+        if getattr(self, '_silence_filter', False):
+            return
 
-            categorie= info_transac["categorie"]
-            # Gérer les catégories inconnues de manière sécurisée
-            if categorie in self.dictionnaire_categories:
-                icon= self.dictionnaire_categories[categorie][0]
-            else:
-                icon= "help-circle"  # Icôle par défaut pour les catégories inconnues
+        lettre_saisie = self.ids.barre_recherche.text.lower()
+        categorie_filtre = self.ids.menu_categories.text
+        mois_filtre = self.ids.menu_mois.text
 
-            type= info_transac["type"]
-            if type=='Revenu':
-                couleur=(0.1, 0.9, 0.3, 1)
-            else:
-                couleur=(0.9, 0.1, 0.1, 1)
-
-            transaction=Transaction_card(
-                icon_=icon,
-                couleur_= couleur,
-                nom_= nom,
-                categorie_= categorie,
-                montant_= montant,
-                date_= date,
-                mois_= mois
-            )
-
-            conteneur_transaction.add_widget(transaction)
-
-    # FILTRER LES TRANSACTION (barre de recherche, catégorie, mois)
-    def  filtrer_transaction(self):
-        # 1. Récupérer le contenu de la barre de recherche et des différents filtres
-        lettre_saisie= self.ids.barre_recherche.text.lower()
-        categorie_filtre= self.ids.menu_categories.text
-        mois_filtre= self.ids.menu_mois.text
-
-
-        # 2. Comparer les éléments avec aux filtres
-
-        resultat_filtre={}
+        resultat_filtre = {}
         for id_transac, info_transac in self.repertoire_transactions.items():
-            lettre_trouvee=False
-            categorie_trouvee=False
-            mois_trouvee=False
-            if lettre_saisie in info_transac["nom"].lower():
-                lettre_trouvee= True
+            lettre_trouvee = lettre_saisie in info_transac["nom"].lower()
+            categorie_trouvee = (categorie_filtre == "Toutes" or info_transac["categorie"] == categorie_filtre)
+            mois_trouvee = (mois_filtre == "Tous" or info_transac["mois"] == mois_filtre)
 
-            if categorie_filtre == "Toutes" or info_transac["categorie"] == categorie_filtre:
-                categorie_trouvee=True
-
-            if mois_filtre == "Tous" or info_transac["mois"] == mois_filtre:
-                mois_trouvee=True
-
-
-            # 3. Récupérer les éléments qui respectent au filtre
             if lettre_trouvee and categorie_trouvee and mois_trouvee:
-                resultat_filtre[id_transac]= info_transac
+                resultat_filtre[id_transac] = info_transac
 
         self.afficher_transactions(resultat_filtre)
 
@@ -443,66 +408,93 @@ class TransacScreen(MDScreen):
         self.ids.menu_mois.text='Tous'
         self.afficher_transactions(self.repertoire_transactions)
     
-    # RECHARGER LES TRANSACTIONS DEPUIS LA BDD
-    def recharger_transactions(self, *args):
-        """Recharge les transactions depuis la base de données et rafraîchit l'affichage"""
-        # 1. Recharger les catégories pour assurer la synchronisation des icônes/couleurs
-        categories = CategorieModel.get_all()
-        self.dictionnaire_categories = {}
-        for cat in categories:
-            couleur_vals = cat['couleur'].split(',')
-            if len(couleur_vals) == 4:
-                couleur_tuple = tuple(float(x) for x in couleur_vals)
-                self.dictionnaire_categories[cat['nom_categorie']] = [cat['icone'], couleur_tuple]
+    def recharger_transactions(self, event_data=None, *args):
+        """Recharge les transactions. Si event_data contient une transaction, on l'ajoute chirurgicalement."""
         
-        self.list_categories = ['Toutes'] + [cat['nom_categorie'] for cat in categories]
+        # SI C'EST UN AJOUT UNIQUE (depuis le bus d'événement)
+        if isinstance(event_data, dict) and 'id' in event_data:
+            self._ajouter_une_seule_transaction(event_data)
+            return
 
-        # 2. Charger les transactions depuis la BDD (déjà triées par id_transaction DESC)
-        id_compte = get_default_account_id()
-        transactions_bdd = TransactionModel.get_by_account(id_compte) if id_compte else []
-        
-        # 3. Convertir les transactions BDD en format dict pour l'affichage
-        self.repertoire_transactions = {}
-        for i, trans in enumerate(transactions_bdd, 1):
-            cat_nom = trans.get('nom_categorie', 'Inconnue')
+        # SINON, RECHARGEMENT GLOBAL (Initialisation, filtres, suppression...)
+        if self._refreshing:
+             return
+        self._refreshing = True
+
+        try:
+            categories = CategorieModel.get_all()
+            self.dictionnaire_categories = {}
+            for cat in categories:
+                couleur_vals = cat['couleur'].split(',')
+                if len(couleur_vals) == 4:
+                    couleur_tuple = tuple(float(x) for x in couleur_vals)
+                    self.dictionnaire_categories[cat['nom_categorie']] = [cat['icone'], couleur_tuple]
             
-            # Extraire et formater la date
-            date_str = trans['date_transaction']
-            try:
-                # On essaie le format avec heure
-                date_obj = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
-                mois = date_obj.strftime('%B')
-                date_formatee = date_obj.strftime('%d %B %Y')
-            except:
-                # Fallback format simple
+            self.list_categories = ['Toutes'] + [cat['nom_categorie'] for cat in categories]
+
+            id_compte = get_default_account_id()
+            transactions_bdd = TransactionModel.get_by_account(id_compte) if id_compte else []
+            
+            self.repertoire_transactions = {}
+            for i, trans in enumerate(transactions_bdd, 1):
+                cat_nom = trans.get('nom_categorie', 'Inconnue')
+                date_str = trans['date_transaction']
                 try:
-                    date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+                    date_obj = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
                     mois = date_obj.strftime('%B')
                     date_formatee = date_obj.strftime('%d %B %Y')
                 except:
-                    mois = 'Inconnu'
-                    date_formatee = date_str
+                    try:
+                        date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+                        mois = date_obj.strftime('%B')
+                        date_formatee = date_obj.strftime('%d %B %Y')
+                    except: mois = 'Inconnu'; date_formatee = date_str
+                
+                self.repertoire_transactions[i] = {
+                    'id': trans['id_transaction'],
+                    'nom': trans['description'],
+                    'categorie': cat_nom,
+                    'montant': trans['montant'],
+                    'type': 'Revenu' if trans['type_transaction'] == 'ENTREE' else 'Dépense',
+                    'date': date_formatee,
+                    'mois': mois,
+                    'icon': trans.get('icone_categorie', 'help-circle')
+                }
             
-            self.repertoire_transactions[i] = {
-                'id': trans['id_transaction'],
-                'nom': trans['description'],
-                'categorie': cat_nom,
-                'montant': trans['montant'],
-                'type': 'Revenu' if trans['type_transaction'] == 'ENTREE' else 'Dépense',
-                'date': date_formatee,
-                'mois': mois,
-                'icon': trans.get('icone_categorie', 'help-circle')
-            }
-        
-        # 4. Rafraîchir l'affichage
-        self.afficher_transactions(self.repertoire_transactions)
-        
-        # 5. Réinitialiser les visuels des filtres (mais pas forcément la logique si l'utilisateur cherche)
-        if hasattr(self.ids, 'barre_recherche') and not self.ids.barre_recherche.focus:
-            self.ids.barre_recherche.text = ''
-            self.ids.menu_categories.text = 'Toutes'
-            self.ids.menu_mois.text = 'Tous'
+            self.afficher_transactions(self.repertoire_transactions)
+            
+            if hasattr(self.ids, 'barre_recherche') and not self.ids.barre_recherche.focus:
+                if self.ids.barre_recherche.text != '':
+                    self._silence_filter = True
+                    self.ids.barre_recherche.text = ''
+                    self.ids.menu_categories.text = 'Toutes'
+                    self.ids.menu_mois.text = 'Tous'
+                    Clock.schedule_once(lambda dt: setattr(self, '_silence_filter', False), 0.1)
+        except Exception as e:
+            print(f"DEBUG TransacScreen Error: {e}")
+        finally:
+            self._refreshing = False
 
+    def _ajouter_une_seule_transaction(self, info):
+        """Ajoute une seule card au sommet visuel via RecycleView"""
+        couleur = (0.1, 0.9, 0.3, 1) if info["type"] == 'Revenu' else (0.9, 0.1, 0.1, 1)
+        
+        new_item = {
+            'icon_': info.get('icon', 'help-circle'),
+            'couleur_': couleur,
+            'nom_': info["nom"],
+            'categorie_': info["categorie"],
+            'montant_': info["montant"],
+            'date_': info["date"],
+            'mois_': info["mois"]
+        }
+        
+        # On insère au début pour un tri chronologique inverse
+        if hasattr(self.ids, 'rv_transactions'):
+            self.ids.rv_transactions.data.insert(0, new_item)
+            # Rafraîchir le compteur local
+            n = len(self.ids.rv_transactions.data)
+            self.ids.nb_transaction.text = f"Nous avons trouvé {n} transaction{'s' if n > 1 else ''}"
     def _setup_event_listeners(self):
         """Configure les écouteurs d'événements pour le rafraîchissement automatique"""
         # S'abonner spécifiquement aux changements de transactions

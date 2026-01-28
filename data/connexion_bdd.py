@@ -8,9 +8,11 @@ def get_connection():
     """
 Fonction de connexion a la base de donnees sqlite aue je vais appeler dans le fichier de creation de la base de donnees et dans les fichiers ou j'ai besoin d'acceder a la base de donnees.
     """
-       # C'est ici que se cree la bdd, lorsqu'on va appeler la fonction (Si elle n'existe pas)
-    conn = sqlite3.connect(DB_NAME)   
+    # Ajout de multi-threading support et timeout pour éviter les blocages lors des accès concurrents
+    conn = sqlite3.connect(DB_NAME, check_same_thread=False, timeout=10)   
     conn.execute("PRAGMA foreign_keys = ON;")
+    # Optimisation pour les perfs et la concurrence
+    conn.execute("PRAGMA journal_mode = WAL;") 
     return conn
 
 

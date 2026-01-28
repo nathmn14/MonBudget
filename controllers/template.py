@@ -47,3 +47,27 @@ class AppScreen(MDScreen):
         # Animation : Remonter vers le haut
         anim = Animation(pos_hint={"center_x": 0.5, "top": 1.5}, duration=0.5, t='in_back')
         anim.start(notif)
+
+    def set_loading(self, active, message="Initialisation..."):
+        """Affiche ou cache l'overlay de chargement"""
+        overlay = self.ids.loading_screen
+        # Mettre à jour le texte si fourni (on accède à l'enfant Label du MDBoxLayout du LoadingOverlay)
+        # Structure dans KV : LoadingOverlay -> MDBoxLayout -> [Spinner, Label]
+        if hasattr(overlay, 'children') and len(overlay.children) > 0:
+            layout = overlay.children[0]
+            if hasattr(layout, 'children') and len(layout.children) > 0:
+                # Le label est le premier ajouté dans KV (mais dernier dans l'ordre children de Kivy)
+                label = layout.children[0]
+                if hasattr(label, 'text'):
+                    label.text = message
+
+        if active:
+            overlay.disabled = False
+            Animation(opacity=1, duration=0.3).start(overlay)
+        else:
+            def _disable(instance, value):
+                overlay.disabled = True
+            
+            anim = Animation(opacity=0, duration=0.3)
+            anim.bind(on_complete=_disable)
+            anim.start(overlay)

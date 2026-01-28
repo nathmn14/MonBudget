@@ -176,6 +176,7 @@ class DashboardScreen(MDBoxLayout):
     solde_mois = StringProperty("0 FC")
     total_depenses = StringProperty("0 FC")
     total_revenus = StringProperty("+0 FC")
+    _refreshing = False # Verrou pour éviter les refreshs simultanés
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -219,96 +220,89 @@ class DashboardScreen(MDBoxLayout):
             self.charger_donnees()
 
     def charger_donnees(self, *args):
-        """Récupère les statistiques réelles depuis la base de données"""
+        """Récupère les statistiques réelles depuis la base de données de manière asynchrone"""
+        if self._refreshing:
+            return
+            
+        self._refreshing = True
+        import threading
         id_compte = get_default_account_id()
         now = datetime.now()
         month = now.month
         year = now.year
+
+        def _thread_calc():
+            try:
+                # 1. Calculs lourds en thread
+                rev = TransactionModel.get_total_by_type('ENTREE', id_compte, month, year)
+                dep = TransactionModel.get_total_by_type('SORTIE', id_compte, month, year)
+                
+                # Check fallback
+                m, y = month, year
+                if rev == 0 and dep == 0:
+                    latest = TransactionModel.get_latest_transaction_date(id_compte)
+                    if latest:
+                        try:
+                            d_obj = datetime.strptime(latest.split(' ')[0], "%Y-%m-%d")
+                            m, y = d_obj.month, d_obj.year
+                            rev = TransactionModel.get_total_by_type('ENTREE', id_compte, m, y)
+                            dep = TransactionModel.get_total_by_type('SORTIE', id_compte, m, y)
+                        except: pass
+
+                # Préparation Graph Barres
+                month_labels = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"]
+                graph_data = []
+                curr_m, curr_y = m, y
+                for _ in range(3):
+                    graph_data.insert(0, {
+                        "label": month_labels[curr_m - 1],
+                        "revenu": TransactionModel.get_total_by_type('ENTREE', id_compte, curr_m, curr_y),
+                        "depense": TransactionModel.get_total_by_type('SORTIE', id_compte, curr_m, curr_y),
+                    })
+                    curr_m -= 1
+                    if curr_m == 0: curr_m = 12; curr_y -= 1
+
+                # Stats catégories
+                cat_stats = TransactionModel.get_stats_by_category(id_compte, 'SORTIE', m, y)
+
+                # 2. Mise à jour UI sur le thread principal
+                def _ui_update(dt):
+                    self.total_revenus = f"+{int(rev):,}".replace(',', ' ')
+                    self.total_depenses = f"-{int(dep):,}".replace(',', ' ')
+                    self.solde_mois = f"{int(rev - dep):,}".replace(',', ' ') + " FC"
+                    
+                    if hasattr(self.ids, "graph_barres"):
+                        self.ids.graph_barres.update_data(graph_data)
+                    
+                    self._update_cat_ui(cat_stats)
+                    self._refreshing = False
+
+                Clock.schedule_once(_ui_update)
+            except Exception as e:
+                print(f"DEBUG Dashboard Error: {e}")
+                self._refreshing = False
+
+        threading.Thread(target=_thread_calc, daemon=True).start()
+
+    def _update_cat_ui(self, stats):
+        if not hasattr(self.ids, 'box_categories_stats'): return
         
-        # Vérifier s'il y a des données pour le mois en cours
-        revenus = TransactionModel.get_total_by_type('ENTREE', id_compte, month, year)
-        depenses = TransactionModel.get_total_by_type('SORTIE', id_compte, month, year)
-        
-        # Si aucune donnée ce mois-ci, on cherche le mois le plus récent avec activité
-        if revenus == 0 and depenses == 0:
-            latest_date_str = TransactionModel.get_latest_transaction_date(id_compte)
-            if latest_date_str:
-                try:
-                    # Gérer les formats YYYY-MM-DD
-                    date_obj = datetime.strptime(latest_date_str.split(' ')[0], "%Y-%m-%d")
-                    month = date_obj.month
-                    year = date_obj.year
-                    # Recalculer
-                    revenus = TransactionModel.get_total_by_type('ENTREE', id_compte, month, year)
-                    depenses = TransactionModel.get_total_by_type('SORTIE', id_compte, month, year)
-                except:
-                    pass
-        
-        # Mise à jour de l'affichage
-        self.total_revenus = f"+{int(revenus):,}".replace(',', ' ')
-        self.total_depenses = f"-{int(depenses):,}".replace(',', ' ')
-        self.solde_mois = f"{int(revenus - depenses):,} FC".replace(',', ' ')
-
-        if hasattr(self, "ids") and hasattr(self.ids, "graph_barres"):
-            month_labels = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"]
-
-            months = []
-            m = month
-            y = year
-            for _ in range(3):
-                months.append((m, y))
-                m -= 1
-                if m == 0:
-                    m = 12
-                    y -= 1
-
-            months = list(reversed(months))
-            data = []
-            for m, y in months:
-                data.append({
-                    "label": month_labels[m - 1],
-                    "revenu": TransactionModel.get_total_by_type('ENTREE', id_compte, m, y),
-                    "depense": TransactionModel.get_total_by_type('SORTIE', id_compte, m, y),
-                })
-
-            self.ids.graph_barres.update_data(data)
-        
-        # 2. Répartition par catégorie pour ce mois spécifique
-        self.recharger_categories(month, year)
-
-    def recharger_categories(self, month=None, year=None):
-        id_compte = get_default_account_id()
-        if not hasattr(self.ids, 'box_categories_stats'):
-            return
-
-        # On vide la liste actuelle
         self.ids.box_categories_stats.clear_widgets()
-        
-        # Récupérer les stats par catégorie (Dépenses uniquement pour le camembert)
-        stats = TransactionModel.get_stats_by_category(id_compte, 'SORTIE', month, year)
-        
-        # Préparer les données pour le graphique
         chart_data = []
         
         for s in stats:
-            # 1. Ajouter à la liste textuelle
-            couleur_tuple = tuple(float(x) for x in s['couleur'].split(','))
+            couleur_vals = s['couleur'].split(',')
+            couleur_tuple = tuple(float(x) for x in couleur_vals) if len(couleur_vals) == 4 else (0.5, 0.5, 0.5, 1)
             
             item = Factory.ItemCategorie()
             item.nom = s['nom']
-            item.montant = f"{int(s['total']):,} FC".replace(',', ' ')
+            item.montant = f"{int(s['total']):,}".replace(',', ' ') + " FC"
             item.icone = s['icone']
             item.couleur_icone = couleur_tuple
             self.ids.box_categories_stats.add_widget(item)
             
-            # 2. Préparer pour le graphique
-            chart_data.append({
-                'nom': s['nom'],
-                'total': float(s['total']),
-                'couleur': couleur_tuple
-            })
+            chart_data.append({'nom': s['nom'], 'total': float(s['total']), 'couleur': couleur_tuple})
             
-        # Mettre à jour le graphique
         if hasattr(self.ids, 'chart_pie'):
             self.ids.chart_pie.data = chart_data
     

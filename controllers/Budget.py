@@ -17,13 +17,13 @@ from utils.voice_summary import VoiceSummary
 
 # PAGE 'BUDGET'
 class BudgetScreen(MDBoxLayout):
-    titre_page=StringProperty('Budget')
-
+    titre_page = StringProperty('Budget')
 
     # Propriétés réactives (acceptent maintenant les décimaux)
     budget_total = NumericProperty(60000.0)
     montant_utilise = NumericProperty(0.0)
     jours_restants = NumericProperty(20)
+    _refreshing = False # Empêcher les doubles rafraîchissements
 
     montant_restant = NumericProperty(0.0)
     pourcentage_utilise = NumericProperty(0.0)
@@ -138,6 +138,9 @@ class BudgetScreen(MDBoxLayout):
     
     def charger_donnees_depuis_bdd(self):
         """Charge les données du budget et des transactions depuis la BDD"""
+        if self._refreshing: return
+        self._refreshing = True
+        
         id_compte = get_default_account_id()
         if id_compte:
             # Charger le budget depuis la BDD (ou créer un par défaut)
@@ -162,6 +165,8 @@ class BudgetScreen(MDBoxLayout):
             self.montant_utilise_formate = self.format_montant_avec_fc(self.montant_utilise)
             self.montant_restant_formate = self.format_montant_avec_fc(self.montant_restant)
             self.depenses_journalieres_formate = self.format_montant(self.depenses_journalieres)  # Sans FC
+            
+        self._refreshing = False
 
     # CRÉATION D'UNE BOITE DE DIALOGUE POUR MODIFIER LE BUDGET
     popup = None

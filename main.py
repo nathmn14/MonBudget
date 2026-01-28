@@ -42,13 +42,8 @@ class MainApp(MDApp):
         saved_theme = preferences_manager.get_theme()
         self.theme_cls.theme_style = saved_theme
         
-        # Configurer la taille de fenêtre depuis les préférences
-        saved_size = preferences_manager.get_window_size()
-        Window.size = tuple(saved_size)
-        
-        # Forcer la taille mobile si nécessaire
-        if Window.size != (360, 640):
-            Window.size = (360, 640)
+        # Configurer la taille de fenêtre
+        Window.size = (360, 640)
         
         self.custom_colors = {
             "Light": {
@@ -66,15 +61,11 @@ class MainApp(MDApp):
         }
 
         #--- CHARGER LES FICHIER .KV---
-        # 2. Charger les enfants
         Builder.load_file("views/Dashboard_Screen.kv")
         Builder.load_file("views/Budget_Screen.kv")
         Builder.load_file("views/Categorie_Screen.kv")
         Builder.load_file("views/Transac_Screen.kv")
         Builder.load_file("views/Parametre_Screen.kv")
-
-
-        #a. Charger le parrent d'abord !!
         Builder.load_file("views/Connexion.kv")
         Builder.load_file("views/Template.kv")
 
@@ -82,47 +73,32 @@ class MainApp(MDApp):
         sm.add_widget(LoginScreen(name="login_screen"))
         sm.add_widget(AppScreen(name="app_screen"))
 
-
         return sm
 
     def notify(self, message, type="info"):
         """Fonction universelle appelable partout"""
-        # On récupère l'instance du template
-        screen = self.root.get_screen('app_screen')
-        screen.notifier(message, type)
+        try:
+            # On cherche l'écran 'app_screen' dans le ScreenManager (root)
+            screen = self.root.get_screen('app_screen')
+            if hasattr(screen, 'notifier'):
+                screen.notifier(message, type)
+        except: pass
 
     def on_stop(self):
         """Appelé quand l'application se ferme - sauvegarde les préférences"""
-        # Forcer la taille mobile avant de sauvegarder
-        Window.size = (360, 640)
-        
-        # Sauvegarder la taille actuelle de la fenêtre
-        current_size = list(Window.size)
-        preferences_manager.set_window_size(current_size[0], current_size[1])
-        
         # Sauvegarder le thème actuel
         current_theme = self.theme_cls.theme_style
         preferences_manager.set_theme(current_theme)
-        
-        print("Préférences sauvegardées avec succès")
+        print("Préférences sauvegardées")
 
 
 if __name__ == "__main__":
+    # Initialisation rapide avant lancement
+    try:
+        init_database()
+        init_default_user_and_account()
+        CategorieModel.init_default_categories()
+    except Exception as e:
+        print(f"Init error: {e}")
 
-    # 1. Creation de la base donnees si elle n'existe pas
-    init_database()
-
-    print("🗄️  Base de donnees initialisee avec succes.")
-
-    # 2. Création de l'utilisateur et du compte par défaut
-    init_default_user_and_account()
-    
-    print("👤 Utilisateur et compte par defaut crees.")
-    
-    # 3. Création des catégories par défaut
-    CategorieModel.init_default_categories()
-    
-    print("📂 Categories par defaut initialisees.")
-
-    # 4. lancement de l'application 
     MainApp().run()
