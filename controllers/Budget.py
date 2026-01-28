@@ -151,20 +151,21 @@ class BudgetScreen(MDBoxLayout):
                 # Utiliser les vrais jours restants calculés dynamiquement
                 self.jours_restants = self.calculer_jours_restants_reels()
             
-            # Calculer le budget net utilisé (Dépenses - Revenus)
-            # Récupérer toutes les transactions sans filtre de mois pour avoir le total réel
-            montant_depenses = TransactionModel.get_total_by_type('SORTIE', id_compte)
-            montant_revenus = TransactionModel.get_total_by_type('ENTREE', id_compte)
+            # Calculer le budget utilisé (Dépenses UNIQUEMENT pour le mois en cours)
+            now = datetime.now()
+            m, y = now.month, now.year
             
-            # Le montant "utilisé" net est la différence. 
-            # Si Revenus > Dépenses, montant_utilise sera négatif, donc budget_restant (total - utilise) augmentera.
-            self.montant_utilise = montant_depenses - montant_revenus
+            # Récupérer le total des dépenses du mois
+            montant_depenses = TransactionModel.get_total_by_type('SORTIE', id_compte, m, y)
             
-            # Mettre à jour les propriétés formatées avec les bonnes méthodes
+            # Le montant utilisé correspond au total des dépenses (sans être déduit par les revenus)
+            self.montant_utilise = float(montant_depenses)
+            
+            # Mettre à jour les propriétés formatées
             self.budget_total_formate = self.format_montant_avec_fc(self.budget_total)
             self.montant_utilise_formate = self.format_montant_avec_fc(self.montant_utilise)
             self.montant_restant_formate = self.format_montant_avec_fc(self.montant_restant)
-            self.depenses_journalieres_formate = self.format_montant(self.depenses_journalieres)  # Sans FC
+            self.depenses_journalieres_formate = self.format_montant(self.depenses_journalieres)
             
         self._refreshing = False
 

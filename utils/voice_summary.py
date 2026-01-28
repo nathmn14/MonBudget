@@ -100,115 +100,141 @@ Merci d'avoir consulté votre résumé budgétaire.
     def create_summary_popup(self, budget_data, on_close=None):
         """Crée un popup élégant pour le résumé vocal"""
         
-        try:
-            summary_text = self.generate_budget_summary(budget_data)
-            
-            from kivymd.app import MDApp
-            from kivy.metrics import dp
-            from kivymd.uix.floatlayout import MDFloatLayout
-            from kivymd.uix.button import MDFillRoundFlatIconButton, MDIconButton
-            from kivymd.uix.label import MDLabel
-            
-            app = MDApp.get_running_app()
-            is_dark = app.theme_cls.theme_style == "Dark"
-            text_color = (1, 1, 1, 1) if is_dark else (0.1, 0.1, 0.1, 1)
-            
-            # Récupérer la couleur d'accent du dashboard/app
-            accent_color = [0.1, 0.5, 0.8, 1] # Bleu par défaut
-            if hasattr(app, 'custom_colors'):
-                accent_color = app.custom_colors[app.theme_cls.theme_style].get("accent", accent_color)
-            
-            # Conteneur principal
-            content = MDFloatLayout(size_hint_y=None, height=dp(420))
-            
-            # Bouton fermer (Haut Droite)
-            btn_close = MDIconButton(
-                icon="close",
-                pos_hint={'top': 1, 'right': 1},
-                on_release=lambda x: self.close_dialog(on_close)
-            )
-            content.add_widget(btn_close)
-            
-            # Titre
-            title_lbl = MDLabel(
-                text="Résumé du Budget",
-                halign="center",
-                font_style="H6",
-                bold=True,
-                theme_text_color="Primary",
-                pos_hint={'center_x': 0.5, 'center_y': 0.85},
-                adaptive_height=True
-            )
-            content.add_widget(title_lbl)
-            
-            # Zone de texte (Scrollable)
-            scroll = MDScrollView(
-                size_hint=(0.9, None),
-                height=dp(200),
-                pos_hint={'center_x': 0.5, 'center_y': 0.5}
-            )
-            
-            txt_box = MDCard(
-                orientation="vertical",
-                padding=dp(15),
-                size_hint_y=None,
-                adaptive_height=True,
-                md_bg_color=(0.2, 0.2, 0.2, 0.2) if is_dark else (0, 0, 0, 0.05),
-                radius=[15,],
-                elevation=0
-            )
-            
-            msg_lbl = MDLabel(
-                text=summary_text,
-                theme_text_color="Custom",
-                text_color=text_color,
-                font_style="Body1",
-                adaptive_height=True,
-                markup=True
-            )
-            
-            txt_box.add_widget(msg_lbl)
-            scroll.add_widget(txt_box)
-            content.add_widget(scroll)
-            
-            # BOUTON MODERNE (Pareil que Modifier le budget)
-            btn_play = MDFillRoundFlatIconButton(
-                text="ÉCOUTER LE RÉSUMÉ",
-                icon="volume-high",
-                pos_hint={'center_x': 0.5, 'y': 0.05},
-                size_hint_x=0.9,
-                height=dp(48),
-                md_bg_color=accent_color,
-                text_color=(1, 1, 1, 1),
-                elevation=0.5,
-                on_release=lambda x: self.speak_summary(summary_text)
-            )
-            content.add_widget(btn_play)
-            
-            self.current_dialog = MDDialog(
-                type="custom",
-                content_cls=content,
-                size_hint=(0.9, None),
-                radius=[28, 28, 28, 28]
-            )
-            
-            return self.current_dialog
-            
-        except Exception as e:
-            print(f"ERROR in create_summary_popup: {e}")
-            return None
-            
-        except Exception as e:
-            print(f"[BUDGET-RESUME] CRASH: {e}")
-            import traceback
-            traceback.print_exc()
-            return None
-            
-        except Exception as e:
-            print(f"CRITICAL ERROR in create_summary_popup: {e}")
-            import traceback
-            traceback.print_exc()
-            return None
+        # Générer le texte du résumé
+        summary_text = self.generate_budget_summary(budget_data)
+        
+        # Créer le contenu du popup avec un design amélioré et support du thème
+        from kivymd.app import MDApp
+        app = MDApp.get_running_app()
+        is_dark_theme = app.theme_cls.theme_style == "Dark"
+        
+        # Couleurs adaptatives selon le thème
+        if is_dark_theme:
+            bg_color = (0.2, 0.2, 0.2, 1)  # Gris foncé pour thème sombre
+            card_bg_color = (0.15, 0.15, 0.15, 1)  # Gris plus foncé pour la carte
+            text_color = (1, 1, 1, 1)  # Texte blanc
+        else:
+            bg_color = (1, 1, 1, 1)  # Blanc pour thème clair
+            card_bg_color = (0.95, 0.95, 0.95, 1)  # Gris clair pour la carte
+            text_color = (0, 0, 0, 1)  # Texte noir
+        
+        # Layout principal (pas de MDCard ici)
+        content = MDBoxLayout(
+            orientation="vertical",
+            spacing="15dp",
+            padding="20dp",
+            size_hint_y=None,
+            height="420dp",
+            md_bg_color=bg_color
+        )
+        
+        # Titre avec icône
+        title_label = MDLabel(
+            text="Résumé Vocal du Budget",
+            font_style="H6",
+            theme_text_color="Primary",
+            bold=True,
+            halign="center",
+            size_hint_y=None,
+            height="50dp"
+        )
+        
+        # Texte du résumé dans une carte avec scroll et couleurs adaptatives
+        summary_card = MDCard(
+            orientation="vertical",
+            padding="15dp",
+            size_hint_y=None,
+            height="180dp",
+            md_bg_color=card_bg_color,
+            elevation=2,
+            radius=[10, 10, 10, 10]
+        )
+        
+        # Créer le scrollview pour le texte
+        scroll_view = MDScrollView(
+            size_hint_y=None,
+            height="150dp"
+        )
+        
+        # Layout pour le contenu scrollable
+        scroll_content = MDBoxLayout(
+            orientation="vertical",
+            size_hint_y=None,
+            adaptive_height=True
+        )
+        
+        summary_label = MDLabel(
+            text=summary_text,
+            theme_text_color="Secondary",  # Utilise le thème automatiquement
+            text_size=(280, None),  # Largeur maximale pour le texte
+            halign="left",  # Aligné à gauche pour meilleure lisibilité
+            valign="top",
+            font_style="Body1",
+            adaptive_height=True,
+            padding=(10, 5),
+            color=text_color  # Couleur explicite pour garantir la lisibilité
+        )
+        
+        scroll_content.add_widget(summary_label)
+        scroll_view.add_widget(scroll_content)
+        summary_card.add_widget(scroll_view)
+        
+        # Boutons de contrôle dans une layout horizontale
+        button_layout = MDBoxLayout(
+            orientation="horizontal",
+            spacing="10dp",
+            size_hint_y=None,
+            height="50dp"
+        )
+        
+        play_button = MDRaisedButton(
+            text="Lire",
+            icon="volume-high",
+            on_release=lambda x: self.speak_summary(summary_text),
+            md_bg_color=(0.1, 0.7, 0.3, 1),  # Vert pour l'action
+            size_hint_x=0.5
+        )
+        
+        stop_button = MDRaisedButton(
+            text="Arrêter",
+            icon="stop",
+            on_release=lambda x: (
+                print("DEBUG: Bouton Arrêter cliqué"),
+                self.stop_speaking()
+            ),
+            md_bg_color=(0.9, 0.3, 0.3, 1),  # Rouge pour l'arrêt
+            size_hint_x=0.5
+        )
+        
+        button_layout.add_widget(play_button)
+        button_layout.add_widget(stop_button)
+        
+        # Bouton fermer
+        close_button = MDFlatButton(
+            text="Fermer",
+            on_release=lambda x: self.close_dialog(on_close),
+            theme_text_color="Primary",
+            size_hint_y=None,
+            height="40dp"
+        )
+        
+        # Assembler le contenu
+        content.add_widget(title_label)
+        content.add_widget(summary_card)
+        content.add_widget(button_layout)
+        content.add_widget(close_button)
+        
+        # Créer le dialog avec un design moderne (pas de double MDCard)
+        self.current_dialog = MDDialog(
+            title="",  # Pas de titre dans le dialog, titre dans le contenu
+            type="custom",
+            content_cls=content,
+            size_hint=(0.9, None),
+            height="460dp",
+            radius=[20, 20, 20, 20]
+        )
+        
+        return self.current_dialog
     
     def speak_summary(self, text):
         """Lit le résumé à voix haute"""

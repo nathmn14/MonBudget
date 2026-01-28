@@ -176,6 +176,7 @@ class TransacAddScreen(MDScreen):
             date_str = self.ids.date_transac.text
             
             # --- ACTION IMMÉDIATE ---
+            # On change d'écran tout de suite
             self.parent.transition.direction = 'right'
             self.parent.transition.duration = 0.15 
             self.parent.current = 'list_screen'
@@ -187,7 +188,9 @@ class TransacAddScreen(MDScreen):
                     # Préparation date
                     try: 
                         date_obj = datetime.strptime(date_str, "%d/%m/%Y")
-                        date_bdd = date_obj.replace(hour=datetime.now().hour, minute=datetime.now().minute, second=datetime.now().second).strftime("%Y-%m-%d %H:%M:%S")
+                        # Garder l'heure actuelle pour le tri précis
+                        now = datetime.now()
+                        date_bdd = date_obj.replace(hour=now.hour, minute=now.minute, second=now.second).strftime("%Y-%m-%d %H:%M:%S")
                     except: date_bdd = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
                     categories = CategorieModel.get_all()
@@ -207,7 +210,7 @@ class TransacAddScreen(MDScreen):
                     def _ui(*args):
                         new_info = {
                             'id': tid, 'nom': description, 'categorie': categorie_nom,
-                            'montant': montant, 'type': 'Revenu' if 'ENTREE' in date_bdd or self.ids.btn_revenu.md_bg_color == [0.45, 1, 0.35, 1] else 'Dépense',
+                            'montant': montant, 'type': 'Revenu' if self.ids.btn_revenu.md_bg_color == [0.45, 1, 0.35, 1] else 'Dépense',
                             'date': datetime.now().strftime("%d %B %Y"), 'mois': datetime.now().strftime("%B"),
                             'icon': cat_data['icone']
                         }
@@ -248,81 +251,27 @@ class Transaction_card(RecycleDataViewBehavior, MDCard):
 
 # LA PAGE TRANSACATION
 class TransacScreen(MDScreen):
-    # On définit nos propriétés
     repertoire_transactions = DictProperty()
     dictionnaire_categories = DictProperty()
     list_categories = ListProperty()
     list_mois = ListProperty()
-    _refreshing = False # Verrou anti-spam/anti-conflict
-    _search_event = None # Pour le débouclage de la recherche
-    # On initialise nos propriétés
-    def __init__(self,**kwargs):
+    _refreshing = False 
+    _search_event = None 
+    _silence_filter = False
+
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        
-        # S'abonner aux événements pour le rafraîchissement automatique
         self._setup_event_listeners()
-        
-        # Charger les catégories depuis la BDD
-        categories = CategorieModel.get_all()
-        self.dictionnaire_categories = {}
-        for cat in categories:
-            couleur_tuple = tuple(float(x) for x in cat['couleur'].split(','))
-            self.dictionnaire_categories[cat['nom_categorie']] = [cat['icone'], couleur_tuple]
-        
-        # Ajouter une catégorie par défaut pour les transactions inconnues
-        self.dictionnaire_categories["Inconnue"] = ["help-circle", (0.5, 0.5, 0.5, 1)]
-        
-        self.list_categories = ['Toutes'] + [cat['nom_categorie'] for cat in categories]
-        self.list_mois = ['Tous','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Aout','Septembre','Octobre','Novembre','Décembre']
-        
-        # Charger les transactions depuis la BDD
-        id_compte = get_default_account_id()
-        transactions_bdd = TransactionModel.get_by_account(id_compte) if id_compte else []
-        
-        # Convertir les transactions BDD en format dict pour affichage
-        self.repertoire_transactions = {}
-        for i, trans in enumerate(transactions_bdd, 1):
-            # Récupérer la catégorie directement depuis les données de la transaction
-            cat_nom = trans.get('nom_categorie', 'Inconnue')
-            cat_icone = trans.get('icone_categorie', 'help-circle')
-            
-            # Si la catégorie n'existe pas dans notre dictionnaire, l'ajouter
-            if cat_nom not in self.dictionnaire_categories and cat_nom != 'Inconnue':
-                cat_couleur = trans.get('couleur_categorie', '0.5,0.5,0.5,1')
-                couleur_tuple = tuple(float(x) for x in cat_couleur.split(','))
-                self.dictionnaire_categories[cat_nom] = [cat_icone, couleur_tuple]
-            
-            # Extraire le mois de la date
-            date_str = trans['date_transaction']
-            try:
-                date_obj = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
-                mois = date_obj.strftime('%B')
-                date_formatee = date_obj.strftime('%d %B %Y')
-            except:
-                mois = 'Inconnu'
-                date_formatee = date_str
-            
-            type_display = 'Revenu' if trans['type_transaction'] == 'ENTREE' else 'Dépense'
-            
-            self.repertoire_transactions[i] = {
-                'id': trans['id_transaction'],
-                'nom': trans['description'],
-                'categorie': cat_nom,
-                'montant': trans['montant'],
-                'type': type_display,
-                'date': date_formatee,
-                'mois': mois
-            }
-        
-        self.menu = None
+        Clock.schedule_once(lambda dt: self.recharger_transactions())
 
     def on_pre_enter(self, *args):
-        """Chargé AVANT l'affichage : On affiche TOUT directement"""
-        # 1. Chargement immédiat des données (Back-end)
+        """Chargé AVANT l'affichage : On prépare tout"""
         self.recharger_transactions()
         
-        # 2. Reset visuel des widgets (Front-end) avec sécurité
-        def _reset_ui(dt):
+        def _initial_populate(dt):
+            if self.repertoire_transactions:
+                self.afficher_transactions(self.repertoire_transactions)
+            
             if hasattr(self, 'ids') and 'barre_recherche' in self.ids:
                 self._silence_filter = True
                 self.ids.barre_recherche.text = ""
@@ -330,17 +279,20 @@ class TransacScreen(MDScreen):
                 self.ids.menu_mois.text = "Tous"
                 self._silence_filter = False
         
-        # On attend la fin du frame actuel pour s'assurer que les ids sont liés
-        Clock.schedule_once(_reset_ui)
+        Clock.schedule_once(_initial_populate, 0.05)
 
-    # AFFICHAGE DES TRANSACTION (RECYCLEVIEW : ULTRA RAPIDE)
     def afficher_transactions(self, repertoire):
         """Met à jour les données du RecycleView"""
-        self.ids.nb_transaction.text = f"Nous avons trouvé {len(repertoire)} transaction{'s' if len(repertoire) > 1 else ''}"
+        if hasattr(self.ids, 'nb_transaction'):
+            n = len(repertoire)
+            self.ids.nb_transaction.text = f"Nous avons trouvé {n} transaction{'s' if n > 1 else ''}"
         
-        # Préparation des données pour le RecycleView
         rv_data = []
-        for id_key, info in repertoire.items():
+        # On trie pour avoir les plus récentes en haut (basé sur la clé du dict si numérique)
+        keys = sorted(repertoire.keys(), reverse=True)
+        
+        for k in keys:
+            info = repertoire[k]
             cat = info["categorie"]
             icon = self.dictionnaire_categories.get(cat, ["help-circle"])[0] if cat in self.dictionnaire_categories else "help-circle"
             couleur = (0.1, 0.9, 0.3, 1) if info["type"] == 'Revenu' else (0.9, 0.1, 0.1, 1)
@@ -355,162 +307,109 @@ class TransacScreen(MDScreen):
                 'mois_': info["mois"]
             })
 
-        # Mise à jour directe (atomique et instantanée)
         if hasattr(self.ids, 'rv_transactions'):
             self.ids.rv_transactions.data = rv_data
 
-    # RÉINITIALISER LES FILTRES ( barre de recherche, categories, mois)
-    def reinitialiser_filtres(self):
-        # 1. Remettre les menus à leur état initial
-        if 'menu_categories' in self.ids: self.ids.menu_categories.text = "Toutes"
-        if 'menu_mois' in self.ids: self.ids.menu_mois.text = "Tous"
-        if 'barre_recherche' in self.ids: self.ids.barre_recherche.text = ""
-        self.filtrer_transaction()
-
-    # FILTRER LES TRANSACTION (AVEC DÉBOUCLAGE)
     def filtrer_transaction(self, *args):
+        """Débouclage de la recherche pour éviter les micro-lags"""
         if self._search_event:
             self._search_event.cancel()
         self._search_event = Clock.schedule_once(self._do_filtring, 0.3)
 
     def _do_filtring(self, dt):
-        """Exécute réellement la logique de filtrage"""
-        if getattr(self, '_silence_filter', False):
-            return
+        if self._silence_filter: return
+        if not hasattr(self, 'ids'): return
 
-        lettre_saisie = self.ids.barre_recherche.text.lower() if 'barre_recherche' in self.ids else ""
-        categorie_filtre = self.ids.menu_categories.text if 'menu_categories' in self.ids else "Toutes"
-        mois_filtre = self.ids.menu_mois.text if 'menu_mois' in self.ids else "Tous"
+        lettre_saisie = self.ids.barre_recherche.text.lower()
+        cat_filtre = self.ids.menu_categories.text
+        mois_filtre = self.ids.menu_mois.text
 
-        resultat_filtre = {}
-        for id_transac, info_transac in self.repertoire_transactions.items():
-            lettre_trouvee = lettre_saisie in info_transac["nom"].lower()
-            categorie_trouvee = (categorie_filtre == "Toutes" or info_transac["categorie"] == categorie_filtre)
-            mois_trouvee = (mois_filtre == "Tous" or info_transac["mois"] == mois_filtre)
+        resultat = {}
+        for id_t, info in self.repertoire_transactions.items():
+            if (lettre_saisie in info["nom"].lower() and
+                (cat_filtre == "Toutes" or info["categorie"] == cat_filtre) and
+                (mois_filtre == "Tous" or info["mois"] == mois_filtre)):
+                resultat[id_t] = info
 
-            if lettre_trouvee and categorie_trouvee and mois_trouvee:
-                resultat_filtre[id_transac] = info_transac
+        self.afficher_transactions(resultat)
 
-        self.afficher_transactions(resultat_filtre)
-
-    # OUVIR LES MENUS (catégories ou mois)
-    def ouvrir_menu(self,liste, widget_declencheur):
-        Items=[]
-        for i in liste:
-            Items.append({
-                'viewclass':'OneLineListItem',
-                'text': i,
-                'on_release': lambda x=i:self.selectionner_item(x,widget_declencheur)
-            })
-        self.menu=MDDropdownMenu(
-            items=Items,
-            caller=widget_declencheur,
-            #width_mult=2,
-        )
+    def ouvrir_menu(self, liste, widget_declencheur):
+        Items = [{'viewclass': 'OneLineListItem', 'text': i, 'on_release': lambda x=i: self.selectionner_item(x, widget_declencheur)} for i in liste]
+        self.menu = MDDropdownMenu(items=Items, caller=widget_declencheur)
         self.menu.open()
 
-    # SELECTIONNER UN ÉLÉMENTS DANS LE MENU (catégorie ou mois)
-    def selectionner_item(self,x,widget_declencheur):
-        widget_declencheur.text=x
+    def selectionner_item(self, x, widget_declencheur):
+        widget_declencheur.text = x
         self.filtrer_transaction()
         self.menu.dismiss()
 
+    def reinitialiser_filtres(self):
+        self.ids.barre_recherche.text = ''
+        self.ids.menu_categories.text = 'Toutes'
+        self.ids.menu_mois.text = 'Tous'
+        self.afficher_transactions(self.repertoire_transactions)
     
     def recharger_transactions(self, event_data=None, *args):
-        """Recharge les transactions. Si event_data contient une transaction, on l'ajoute chirurgicalement."""
-        
-        # SI C'EST UN AJOUT UNIQUE (depuis le bus d'événement)
+        """Recharge intelligente : si event_data est là, on ajoute juste la carte"""
         if isinstance(event_data, dict) and 'id' in event_data:
             self._ajouter_une_seule_transaction(event_data)
             return
 
-        # SINON, RECHARGEMENT GLOBAL (Initialisation, filtres, suppression...)
-        if self._refreshing:
-             return
+        if self._refreshing: return
         self._refreshing = True
 
         try:
             categories = CategorieModel.get_all()
-            self.dictionnaire_categories = {}
-            for cat in categories:
-                couleur_vals = cat['couleur'].split(',')
-                if len(couleur_vals) == 4:
-                    couleur_tuple = tuple(float(x) for x in couleur_vals)
-                    self.dictionnaire_categories[cat['nom_categorie']] = [cat['icone'], couleur_tuple]
-            
-            self.list_categories = ['Toutes'] + [cat['nom_categorie'] for cat in categories]
+            self.dictionnaire_categories = {c['nom_categorie']: [c['icone'], tuple(float(x) for x in c['couleur'].split(','))] for c in categories}
+            self.dictionnaire_categories["Inconnue"] = ["help-circle", (0.5, 0.5, 0.5, 1)]
+            self.list_categories = ['Toutes'] + [c['nom_categorie'] for c in categories]
 
             id_compte = get_default_account_id()
             transactions_bdd = TransactionModel.get_by_account(id_compte) if id_compte else []
             
             self.repertoire_transactions = {}
             for i, trans in enumerate(transactions_bdd, 1):
-                cat_nom = trans.get('nom_categorie', 'Inconnue')
-                date_str = trans['date_transaction']
                 try:
-                    date_obj = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
-                    mois = date_obj.strftime('%B')
-                    date_formatee = date_obj.strftime('%d %B %Y')
+                    d_obj = datetime.strptime(trans['date_transaction'], '%Y-%m-%d %H:%M:%S')
                 except:
-                    try:
-                        date_obj = datetime.strptime(date_str, '%Y-%m-%d')
-                        mois = date_obj.strftime('%B')
-                        date_formatee = date_obj.strftime('%d %B %Y')
-                    except: mois = 'Inconnu'; date_formatee = date_str
+                    try: d_obj = datetime.strptime(trans['date_transaction'], '%Y-%m-%d')
+                    except: d_obj = datetime.now()
                 
                 self.repertoire_transactions[i] = {
                     'id': trans['id_transaction'],
                     'nom': trans['description'],
-                    'categorie': cat_nom,
+                    'categorie': trans.get('nom_categorie', 'Inconnue'),
                     'montant': trans['montant'],
                     'type': 'Revenu' if trans['type_transaction'] == 'ENTREE' else 'Dépense',
-                    'date': date_formatee,
-                    'mois': mois,
-                    'icon': trans.get('icone_categorie', 'help-circle')
+                    'date': d_obj.strftime('%d %B %Y'),
+                    'mois': d_obj.strftime('%B')
                 }
             
             self.afficher_transactions(self.repertoire_transactions)
-            
-            # --- Sécurité : Accès aux IDS ---
-            if hasattr(self, 'ids') and 'barre_recherche' in self.ids:
-                # Si l'utilisateur n'est pas en train de chercher, on nettoie
-                if not self.ids.barre_recherche.focus and self.ids.barre_recherche.text != '':
-                    self.ids.barre_recherche.text = ''
-                    self.ids.menu_categories.text = 'Toutes'
-                    self.ids.menu_mois.text = 'Tous'
-        except Exception as e:
-            print(f"DEBUG TransacScreen Error: {e}")
-        finally:
-            self._refreshing = False
+        except Exception as e: print(f"Error rechargement: {e}")
+        finally: self._refreshing = False
 
     def _ajouter_une_seule_transaction(self, info):
-        """Ajoute une seule card au sommet visuel via RecycleView"""
+        """Injection chirurgicale au sommet de la liste"""
         couleur = (0.1, 0.9, 0.3, 1) if info["type"] == 'Revenu' else (0.9, 0.1, 0.1, 1)
-        
         new_item = {
             'icon_': info.get('icon', 'help-circle'),
-            'couleur_': couleur,
-            'nom_': info["nom"],
-            'categorie_': info["categorie"],
-            'montant_': info["montant"],
-            'date_': info["date"],
-            'mois_': info["mois"]
+            'couleur_': couleur, 'nom_': info["nom"], 'categorie_': info["categorie"],
+            'montant_': info["montant"], 'date_': info["date"], 'mois_': info["mois"]
         }
-        
-        # On insère au début pour un tri chronologique inverse
         if hasattr(self.ids, 'rv_transactions'):
             self.ids.rv_transactions.data.insert(0, new_item)
-            # Rafraîchir le compteur local
             n = len(self.ids.rv_transactions.data)
             self.ids.nb_transaction.text = f"Nous avons trouvé {n} transaction{'s' if n > 1 else ''}"
+
     def _setup_event_listeners(self):
-        """Configure les écouteurs d'événements pour le rafraîchissement automatique"""
-        # S'abonner spécifiquement aux changements de transactions
+        subscribe_to_data_changes(self._on_data_changed)
         event_bus.subscribe(EventTypes.TRANSACTION_ADDED, self.recharger_transactions)
-        event_bus.subscribe(EventTypes.TRANSACTION_DELETED, self.recharger_transactions)
-        event_bus.subscribe(EventTypes.DATA_RESET, self.recharger_transactions)
-        # S'abonner aux changements de catégorie (couleurs/icônes)
-        event_bus.subscribe(EventTypes.CATEGORY_CHANGED, self.recharger_transactions)
+        event_bus.subscribe(EventTypes.TRANSACTION_DELETED, self._on_data_changed)
+        event_bus.subscribe(EventTypes.DATA_RESET, self._on_data_changed)
+
+    def _on_data_changed(self, *args, **kwargs):
+        Clock.schedule_once(lambda dt: self.recharger_transactions(), 0.1)
 
 
 

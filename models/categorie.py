@@ -215,75 +215,26 @@ class CategorieModel :
         conn.close()
         
         if count > 0:
-            # S'assurer que les couleurs existantes sont uniques et bien distinctes
-            CategorieModel.fix_duplicate_colors()
-            return
+            return  # Des catégories existent déjà
         
-        # Catégories par défaut
+        # Catégories par défaut (nom, type, icone, couleur RGBA)
         default_categories = [
-            ('Alimentation', 'SORTIE', 'food'),
-            ('Transport', 'SORTIE', 'car'),
-            ('Logement', 'SORTIE', 'home'),
-            ('Loisirs', 'SORTIE', 'controller-classic'),
-            ('Courses', 'SORTIE', 'cart'),
-            ('Telephone', 'SORTIE', 'phone-settings'),
-            ('Café', 'SORTIE', 'coffee'),
-            ('Cadeaux', 'SORTIE', 'gift'),
-            ('Cinéma', 'SORTIE', 'movie'),
-            ('Etudes', 'SORTIE', 'school'),
-            ('Santé', 'SORTIE', 'medical-bag'),
-            ('Business', 'SORTIE', 'trending-up'),
-            ('Énergie', 'SORTIE', 'lightning-bolt'),
-            ('Éducation', 'SORTIE', 'book-open-variant'),
-            ('Salaire', 'ENTREE', 'cash-multiple'),
+            ('Alimentation', 'SORTIE', 'food', '0.18,0.8,0.44,1'),
+            ('Transport', 'SORTIE', 'car', '0.2,0.6,0.86,1'),
+            ('Logement', 'SORTIE', 'home', '0.9,0.5,0.13,1'),
+            ('Loisirs', 'SORTIE', 'controller-classic', '0.6,0.3,0.7,1'),
+            ('Courses', 'SORTIE', 'cart', '0.1,0.7,0.7,1'),
+            ('Telephone', 'SORTIE', 'phone-settings', '0.5,0.5,0.5,1'),
+            ('Café', 'SORTIE', 'coffee', '0.44,0.26,0.13,1'),
+            ('Cadeaux', 'SORTIE', 'gift', '0.9,0.3,0.23,1'),
+            ('Cinéma', 'SORTIE', 'movie', '0.2,0.2,0.2,1'),
+            ('Etudes', 'SORTIE', 'school', '0.12,0.5,0.7,1'),
+            ('Santé', 'SORTIE', 'medical-bag', '0.95,0.2,0.4,1'),
+            ('Business', 'SORTIE', 'trending-up', '0.1,0.3,0.5,1'),
+            ('Énergie', 'SORTIE', 'lightning-bolt', '1,0.8,0.2,1'),
+            ('Éducation', 'SORTIE', 'book-open-variant', '0.5,0.4,0.3,1'),
+            ('Salaire', 'ENTREE', 'cash-multiple', '0.15,0.68,0.37,1'),
         ]
         
-        # Palette de 20 couleurs ultra-distinctes (pour éviter d'avoir "3 verts")
-        palette_distincte = [
-            "0.18,0.8,0.44,1", # Emeraude
-            "0.2,0.6,0.86,1",  # Bleu
-            "0.9,0.5,0.13,1",  # Orange
-            "0.6,0.3,0.7,1",   # Violet
-            "0.1,0.7,0.7,1",   # Turquoise
-            "0.9,0.3,0.23,1",  # Rouge
-            "0.44,0.26,0.13,1",# Marron
-            "0.95,0.2,0.4,1",  # Rose
-            "0.1,0.3,0.5,1",   # Bleu Marine
-            "1,0.8,0.2,1",     # Jaune
-            "0.5,0.4,0.3,1",   # Gris-Brun
-            "0.8,0.1,0.5,1",   # Magenta
-            "0.1,0.8,0.8,1",   # Cyan
-            "0.5,0.8,0.1,1",   # Vert Lime
-            "0.8,0.5,0.1,1",   # Ocre
-            "0.2,0.2,0.6,1",   # Bleu Roy
-            "0.6,0.1,0.1,1",   # Bordeaux
-            "0.1,0.5,0.1,1",   # Vert Forêt
-            "0.5,0.1,0.5,1",   # Prune
-            "0.4,0.4,0.4,1",   # Gris
-        ]
-        
-        for i, (nom, type_trans, icon) in enumerate(default_categories):
-            # Prendre la couleur correspondante dans la palette
-            color = palette_distincte[i % len(palette_distincte)]
+        for nom, type_trans, icon, color in default_categories:
             CategorieModel.create(nom, type_trans, icon, color)
-
-    @staticmethod
-    def fix_duplicate_colors():
-        """Force chaque catégorie à avoir une couleur unique et distincte en BDD"""
-        categories = CategorieModel.get_all()
-        
-        # Palette de 20 couleurs ultra-distinctes
-        palette_distincte = [
-            "0.18,0.8,0.44,1", "0.2,0.6,0.86,1", "0.9,0.5,0.13,1", "0.6,0.3,0.7,1",
-            "0.1,0.7,0.7,1", "0.9,0.3,0.23,1", "0.44,0.26,0.13,1", "0.95,0.2,0.4,1",
-            "0.1,0.3,0.5,1", "1,0.8,0.2,1", "0.5,0.4,0.3,1", "0.8,0.1,0.5,1",
-            "0.1,0.8,0.8,1", "0.5,0.8,0.1,1", "0.8,0.5,0.1,1", "0.2,0.2,0.6,1",
-            "0.6,0.1,0.1,1", "0.1,0.5,0.1,1", "0.5,0.1,0.5,1", "0.4,0.4,0.4,1"
-        ]
-
-        print("🛠️  Optimisation des couleurs pour une distinction maximale...")
-        # Réassigner des couleurs uniques à partir de la palette manuelle
-        for i, cat in enumerate(categories):
-            new_color = palette_distincte[i % len(palette_distincte)]
-            CategorieModel.update_by_id(cat['id_categorie'], couleur=new_color)
-        print("✅ Couleurs harmonisées et uniques.")

@@ -130,6 +130,8 @@
 
 
 
+
+
 <TransacScreen>:
     MDBoxLayout:
         orientation: 'vertical'
@@ -141,73 +143,90 @@
             title: 'Transactions'
             subtitle: 'Historique complet'
 
-        # SECTION FILTRES (FIXE EN HAUT)
-        MDBoxLayout:
-            orientation: 'vertical'
-            adaptive_height: True
-            md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_secondary"]
-            padding: [dp(16), dp(16), dp(16), 0]
-            spacing: dp(12)
-            
-            # Barre de recherche
-            MDTextField:
-                id: barre_recherche
-                hint_text: 'Rechercher par nom...'
-                mode: 'round'
-                icon_left: 'magnify'
-                on_text: root.filtrer_transaction()
-
-            MDLabel:
-                text: 'Catégories'
-                font_style: "Caption"
-                theme_text_color: "Secondary"
-                adaptive_height: True
-
-            MDDropDownItem:
-                id: menu_categories
-                text: "Toutes"
-                size_hint_x: 1
-                on_release: root.ouvrir_menu(root.list_categories, self)
-
-            MDLabel:
-                text: "Mois"
-                font_style: "Caption"
-                theme_text_color: "Secondary"
-                adaptive_height: True
-
-            MDDropDownItem:
-                id: menu_mois
-                text: 'Tous'
-                size_hint_x: 1
-                on_release: root.ouvrir_menu(root.list_mois, self)
-
-            MDLabel:
-                id: nb_transaction
-                text: ""
-                font_style: "Caption"
-                theme_text_color: "Secondary"
-                adaptive_height: True
-                padding: [0, dp(10)]
-
-        # LISTE DES TRANSACTIONS (SCROLLABLE RECYCLEVIEW)
         MDFloatLayout:
             size_hint_y: 1
-            
-            RecycleView:
-                id: rv_transactions
-                viewclass: 'Transaction_card'
-                data: []
-                pos_hint: {"top": 1}
-                size_hint_y: 1
+            md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_secondary"]
+            MDScrollView:
+                do_scroll_x: False
+                pos_hint: {"top": 1} # Colle le scroll au haut du FloatLayout
+                size_hint_y: 1       # Force le scroll à prendre toute la hauteur du Float
 
-                RecycleBoxLayout:
-                    default_size: None, dp(130)
-                    default_size_hint: 1, None
-                    size_hint_y: None
-                    height: self.minimum_height
+                # Barre de recherche et Filtres
+                MDBoxLayout:
                     orientation: 'vertical'
-                    spacing: dp(10)
-                    padding: [dp(16), 0, dp(16), dp(80)]
+                    md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_secondary"]
+                    #md_bg_color: 0.9, 0.9, 0.9, 1
+                    padding: dp(16)
+                    spacing: dp(20)
+                    adaptive_height: True
+
+                    # Barre de recherche
+                    MDTextField:
+                        id: barre_recherche
+                        hint_text: 'Rechercher par nom...'
+                        mode: 'round'         #['rectangle', 'round', 'fill', 'line']
+                        icon_left :'magnify'
+                        on_text: root.filtrer_transaction()         # À chaque lettre qu'on saisi, la fonction rechercher_transaction s'exécute
+
+                    #Liste Categorie
+                    MDLabel:
+                        text: 'Categories'
+                        font_styles: "Caption"
+                        theme_text_color: "Secondary"
+                        adaptive_height: True
+
+                    MDDropDownItem:
+                        id: menu_categories
+                        text: "Toutes"
+                        pos_hint: {'center_x':.5}
+                        size_hint_x: 1
+                        on_release: root.ouvrir_menu(root.list_categories,self )
+
+
+                    MDLabel:
+                        text: "Mois"
+                        font_styles: "Caption"
+                        theme_text_color: "Secondary"
+                        adaptive_height: True
+
+                    MDDropDownItem:
+                        id: menu_mois
+                        text: 'Tous'
+                        pos_hint: {'center_x': 0.5}
+                        size_hint_x: 1
+                        on_release: root.ouvrir_menu(root.list_mois,self)
+
+                    # Bouton pour Reinitialiser les filtres
+                    MDRectangleFlatIconButton:
+                        icon: "refresh"
+                        text: "Reinitialiser les filtres"
+                        size_hint_x: 1
+                        #pos_hint_x: {'center_x': .5}
+                        on_release: root.reinitialiser_filtres()
+
+
+                    # Nombre de transactions trouvées
+                    MDLabel:
+                        id: nb_transaction
+                        text: ""
+                        adaptive_height: True
+                        theme_text_color: "Secondary"
+
+                    # ZONE RECYCLEVIEW (Haute Performance)
+                    RecycleView:
+                        id: rv_transactions
+                        viewclass: 'Transaction_card'
+                        size_hint_y: None
+                        height: dp(600)  # Une hauteur suffisante pour le défilement fluide
+                        
+                        RecycleBoxLayout:
+                            default_size: None, dp(120)
+                            default_size_hint: 1, None
+                            size_hint_y: None
+                            height: self.minimum_height
+                            orientation: 'vertical'
+                            spacing: dp(10)
+                            padding: [0, 0, 0, dp(100)] 
 
             MDFloatingActionButton:
                 # 1. Icône petite
