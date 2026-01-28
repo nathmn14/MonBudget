@@ -130,8 +130,6 @@
 
 
 
-
-
 <TransacScreen>:
     MDBoxLayout:
         orientation: 'vertical'
@@ -147,46 +145,49 @@
         MDBoxLayout:
             orientation: 'vertical'
             adaptive_height: True
-            padding: dp(16)
-            spacing: dp(16)
-            md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_primary"]
+            md_bg_color: app.custom_colors[app.theme_cls.theme_style]["bg_secondary"]
+            padding: [dp(16), dp(16), dp(16), 0]
+            spacing: dp(12)
             
             # Barre de recherche
             MDTextField:
                 id: barre_recherche
-                hint_text: 'Rechercher...'
+                hint_text: 'Rechercher par nom...'
                 mode: 'round'
                 icon_left: 'magnify'
                 on_text: root.filtrer_transaction()
 
-            MDBoxLayout:
+            MDLabel:
+                text: 'Catégories'
+                font_style: "Caption"
+                theme_text_color: "Secondary"
                 adaptive_height: True
-                spacing: dp(10)
-                
-                MDDropDownItem:
-                    id: menu_categories
-                    text: "Toutes"
-                    size_hint_x: 0.5
-                    on_release: root.ouvrir_menu(root.list_categories, self)
 
-                MDDropDownItem:
-                    id: menu_mois
-                    text: 'Tous'
-                    size_hint_x: 0.5
-                    on_release: root.ouvrir_menu(root.list_mois, self)
+            MDDropDownItem:
+                id: menu_categories
+                text: "Toutes"
+                size_hint_x: 1
+                on_release: root.ouvrir_menu(root.list_categories, self)
 
-            MDBoxLayout:
+            MDLabel:
+                text: "Mois"
+                font_style: "Caption"
+                theme_text_color: "Secondary"
                 adaptive_height: True
-                MDLabel:
-                    id: nb_transaction
-                    text: ""
-                    font_style: "Caption"
-                    theme_text_color: "Secondary"
-                    valign: 'center'
-                
-                MDIconButton:
-                    icon: "filter-remove-outline"
-                    on_release: root.reinitialiser_filtres()
+
+            MDDropDownItem:
+                id: menu_mois
+                text: 'Tous'
+                size_hint_x: 1
+                on_release: root.ouvrir_menu(root.list_mois, self)
+
+            MDLabel:
+                id: nb_transaction
+                text: ""
+                font_style: "Caption"
+                theme_text_color: "Secondary"
+                adaptive_height: True
+                padding: [0, dp(10)]
 
         # LISTE DES TRANSACTIONS (SCROLLABLE RECYCLEVIEW)
         MDFloatLayout:
@@ -206,7 +207,7 @@
                     height: self.minimum_height
                     orientation: 'vertical'
                     spacing: dp(10)
-                    padding: dp(16)
+                    padding: [dp(16), 0, dp(16), dp(80)]
 
             MDFloatingActionButton:
                 # 1. Icône petite

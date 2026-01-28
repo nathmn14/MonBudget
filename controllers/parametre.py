@@ -358,17 +358,58 @@ class ParametreScreen(MDBoxLayout):
         self._budget_dialog.open()
     
     def _confirmer_budget(self, instance):
-        """Traite la confirmation du nouveau budget"""
-        try:
-            new_budget_text = self._budget_field.text.strip()
-            if not new_budget_text:
-                self._notify("Veuillez entrer un montant", "error")
-                return
+        """Affiche un avertissement avant de réinitialiser les données pour le nouveau budget"""
+        new_budget_text = self._budget_field.text.strip()
+        if not new_budget_text:
+            self._notify("Veuillez entrer un montant", "error")
+            return
             
-            new_budget = int(new_budget_text)
-            if new_budget < 0:
+        try:
+            val = int(new_budget_text)
+            if val < 0:
                 self._notify("Le budget ne peut pas être négatif", "error")
                 return
+        except:
+            self._notify("Montant invalide", "error")
+            return
+
+        # On sauvegarde la valeur car le dialogue va être nettoyé
+        self._temp_new_budget = val
+        self._temp_budget_switch = self._budget_switch.active
+
+        # On cache le premier dialogue
+        self._fermer_dialogue_budget(None)
+
+        # On affiche le WARNING
+        self._budget_warning_dialog = MDDialog(
+            title="⚠️ Attention : Réinitialisation",
+            text=(
+                "Définir un nouveau budget depuis les paramètres va :\n\n"
+                "• Supprimer TOUTES vos transactions actuelles\n"
+                "• Redémarrer votre historique à zéro\n\n"
+                "Voulez-vous vraiment continuer ?"
+            ),
+            buttons=[
+                MDRaisedButton(
+                    text="Annuler",
+                    on_release=lambda x: self._budget_warning_dialog.dismiss()
+                ),
+                MDRaisedButton(
+                    text="Réinitialiser et Définir",
+                    md_bg_color=[0.9, 0.1, 0.1, 1], # Rouge
+                    on_release=self._proceder_mise_a_jour_budget
+                ),
+            ]
+        )
+        self._budget_warning_dialog.open()
+
+    def _proceder_mise_a_jour_budget(self, instance):
+        """Traite réellement la mise à jour après confirmation du warning"""
+        if hasattr(self, '_budget_warning_dialog'):
+            self._budget_warning_dialog.dismiss()
+
+        try:
+            new_budget = self._temp_new_budget
             
             # Récupérer le compte et le reste actuel
             account_id = get_default_account_id()
@@ -384,8 +425,8 @@ class ParametreScreen(MDBoxLayout):
             montant_utilise = montant_depenses - montant_revenus
             reste_budget = current_budget - montant_utilise
             
-            # Si la case est cochée, ajouter le reste au nouveau budget
-            if self._budget_switch.active:
+            # Si la case était cochée
+            if getattr(self, '_temp_budget_switch', False):
                 new_budget += reste_budget
                 message = f"Nouveau budget : {new_budget} FC (incluant {reste_budget} FC restants)"
             else:
@@ -683,7 +724,8 @@ class ParametreScreen(MDBoxLayout):
             "Nathan Monga", 
             "Martha Kalemba",
             "Salem Ohelo",
-            "Timothée Mukash"
+            "Timothée Mukash", 
+            "Emmanuel Tshibwabwa"
         ]
         
         for dev in developpeurs:

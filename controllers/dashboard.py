@@ -44,6 +44,43 @@ class GraphiqueBarres(MDBoxLayout):
                 continue
             label.text = data[i]["label"] if i < len(data) else ""
 
+    def _update_y_axis(self, max_val, chart_bottom_y, chart_h):
+        """Met à jour les étiquettes de l'axe Y avec un positionnement pixel-perfect"""
+        if not hasattr(self, "ids") or "y_axis_labels" not in self.ids:
+            return
+        
+        container = self.ids.y_axis_labels
+        container.clear_widgets()
+        
+        from kivymd.uix.label import MDLabel
+        # On définit 4 niveaux de graduation (0% -> 100%)
+        # i=0 sera en bas (0), i=3 sera en haut (max)
+        for i in range(4):
+            p = i / 3.0
+            val = max_val * p
+            
+            # Formatage compact (k pour milliers)
+            if val >= 1000:
+                text = f"{val/1000:.1f}k" if val % 1000 != 0 else f"{int(val/1000)}k"
+            else:
+                text = str(int(val))
+            
+            # target_y est la coordonnée screen de la ligne de grille
+            target_y = chart_bottom_y + (p * chart_h)
+            
+            lbl = MDLabel(
+                text=text,
+                font_style="Caption",
+                theme_text_color="Secondary",
+                halign="right",
+                size_hint=(None, None),
+                size=(container.width - dp(5), dp(20)),
+                # Centrage vertical sur la ligne : y = target - (hauteur / 2)
+                x=container.x,
+                y=target_y - dp(10)
+            )
+            container.add_widget(lbl)
+
     def draw(self, *args):
         if not hasattr(self, "ids") or "chart_area" not in self.ids:
             return
@@ -55,26 +92,36 @@ class GraphiqueBarres(MDBoxLayout):
 
         max_val = max(max(d.get("revenu", 0), d.get("depense", 0)) for d in self.data)
         if max_val <= 0:
-            max_val = 1
+            max_val = 1000 
 
-        chart_left = area.x + dp(30)
+        import math
+        # Magnitude pour un arrondi propre (ex: 1250 -> 2000, 400 -> 500)
+        magnitude = 10 ** (max(0, len(str(int(max_val))) - 1))
+        max_val = math.ceil(max_val / magnitude) * magnitude
+
+        chart_left = area.x
         chart_right = area.right - dp(10)
-        chart_bottom = area.y + dp(20)
-        chart_top = area.top - dp(20)
-
+        chart_bottom = area.y + dp(15)
+        chart_top = area.top - dp(15)
         chart_h = max(chart_top - chart_bottom, 1)
         chart_w = max(chart_right - chart_left, 1)
 
+        # Mettre à jour l'axe Y (0 en bas, montante)
+        self._update_y_axis(max_val, chart_bottom, chart_h)
+
         with area.canvas.before:
-            Color(0.9, 0.9, 0.9, 1)
-            Line(points=[chart_left, area.y + dp(20), chart_right, area.y + dp(20)])
-            Line(points=[chart_left, area.y + dp(70), chart_right, area.y + dp(70)])
-            Line(points=[chart_left, area.y + dp(120), chart_right, area.y + dp(120)])
+            Color(0.92, 0.92, 0.92, 1) # Gris très clair pour la grille
+            
+            # Dessiner 4 lignes de grille horizontales synchronisées avec les labels
+            for i in range(4):
+                # i=0: bas, i=3: haut
+                y = chart_bottom + (i / 3.0) * chart_h
+                Line(points=[chart_left, y, chart_right, y], width=dp(0.5))
 
             n = len(self.data)
             group_w = chart_w / max(n, 1)
-            bar_w = min(dp(14), group_w * 0.25)
-            gap = dp(2)
+            bar_w = min(dp(18), group_w * 0.3)
+            gap = dp(3)
 
             for i, d in enumerate(self.data):
                 cx = chart_left + group_w * (i + 0.5)
@@ -85,9 +132,11 @@ class GraphiqueBarres(MDBoxLayout):
                 h_rev = (revenu / max_val) * chart_h
                 h_dep = (depense / max_val) * chart_h
 
+                # Couleur Revenu (Vert)
                 Color(0.1, 0.7, 0.3, 1)
                 Rectangle(pos=(cx - bar_w - gap, chart_bottom), size=(bar_w, h_rev))
 
+                # Couleur Dépense (Rouge/Rose)
                 Color(1, 0.3, 0.5, 1)
                 Rectangle(pos=(cx + gap, chart_bottom), size=(bar_w, h_dep))
 

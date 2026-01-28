@@ -59,27 +59,41 @@
     orientation: 'vertical'
     padding: dp(10)
 
-    # Zone des axes et des barres (dessinée dynamiquement en Python)
+    # Zone principale avec Axe Y et Graphique
     MDBoxLayout:
-        id: chart_area
+        orientation: 'horizontal'
         size_hint_y: 0.8
+        
+        # Axe Y (Géré en Python avec positionnement manuel)
+        MDFloatLayout:
+            id: y_axis_labels
+            size_hint_x: None
+            width: dp(40)
+
+        # Zone du graphique (Barres + lignes de grille)
+        MDBoxLayout:
+            id: chart_area
+            size_hint_x: 1
 
     # Étiquettes des mois (alimentées dynamiquement)
     MDBoxLayout:
         size_hint_y: 0.1
-        padding: [dp(40), 0, 0, 0]
+        padding: [dp(40), 0, 0, 0] # Décalage pour aligner avec le graphique (après l'axe Y)
         MDLabel:
             id: month_lbl_0
             text: ""
             font_style: "Caption"
+            halign: "center"
         MDLabel:
             id: month_lbl_1
             text: ""
             font_style: "Caption"
+            halign: "center"
         MDLabel:
             id: month_lbl_2
             text: ""
             font_style: "Caption"
+            halign: "center"
 
     # Légende (Revenus / Dépenses)
     MDBoxLayout:
@@ -137,7 +151,7 @@
         # EN-TÊTE
         Header:
             title: 'MonBudget'
-            subtitle: 'Bienvenu'
+            subtitle: 'Bienvenue'
 
         # Conteneur pour le contenu principale (Statistiques)
         MDFloatLayout:

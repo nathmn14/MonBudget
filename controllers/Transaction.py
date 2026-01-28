@@ -255,7 +255,6 @@ class TransacScreen(MDScreen):
     list_mois = ListProperty()
     _refreshing = False # Verrou anti-spam/anti-conflict
     _search_event = None # Pour le débouclage de la recherche
-
     # On initialise nos propriétés
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
@@ -317,10 +316,22 @@ class TransacScreen(MDScreen):
         
         self.menu = None
 
-    def on_enter(self, *args):
-        """Chargé à chaque affichage de l'écran"""
-        # S'assurer que les données sont à jour au cas ou
+    def on_pre_enter(self, *args):
+        """Chargé AVANT l'affichage : On affiche TOUT directement"""
+        # 1. Chargement immédiat des données (Back-end)
         self.recharger_transactions()
+        
+        # 2. Reset visuel des widgets (Front-end) avec sécurité
+        def _reset_ui(dt):
+            if hasattr(self, 'ids') and 'barre_recherche' in self.ids:
+                self._silence_filter = True
+                self.ids.barre_recherche.text = ""
+                self.ids.menu_categories.text = "Toutes"
+                self.ids.menu_mois.text = "Tous"
+                self._silence_filter = False
+        
+        # On attend la fin du frame actuel pour s'assurer que les ids sont liés
+        Clock.schedule_once(_reset_ui)
 
     # AFFICHAGE DES TRANSACTION (RECYCLEVIEW : ULTRA RAPIDE)
     def afficher_transactions(self, repertoire):
@@ -329,8 +340,6 @@ class TransacScreen(MDScreen):
         
         # Préparation des données pour le RecycleView
         rv_data = []
-        # On trie les transactions par date (la logique de tri est déjà faite dans recharger_transactions)
-        # Mais on s'assure ici de créer la liste de dicts attendue par RV
         for id_key, info in repertoire.items():
             cat = info["categorie"]
             icon = self.dictionnaire_categories.get(cat, ["help-circle"])[0] if cat in self.dictionnaire_categories else "help-circle"
@@ -350,23 +359,28 @@ class TransacScreen(MDScreen):
         if hasattr(self.ids, 'rv_transactions'):
             self.ids.rv_transactions.data = rv_data
 
+    # RÉINITIALISER LES FILTRES ( barre de recherche, categories, mois)
+    def reinitialiser_filtres(self):
+        # 1. Remettre les menus à leur état initial
+        if 'menu_categories' in self.ids: self.ids.menu_categories.text = "Toutes"
+        if 'menu_mois' in self.ids: self.ids.menu_mois.text = "Tous"
+        if 'barre_recherche' in self.ids: self.ids.barre_recherche.text = ""
+        self.filtrer_transaction()
+
     # FILTRER LES TRANSACTION (AVEC DÉBOUCLAGE)
     def filtrer_transaction(self, *args):
-        # On annule le timer précédent
         if self._search_event:
             self._search_event.cancel()
-        
-        # On lance un nouveau timer de 300ms (débouclage)
         self._search_event = Clock.schedule_once(self._do_filtring, 0.3)
 
     def _do_filtring(self, dt):
-        """Exécute réellement la logique de filtrage après le délai de débouclage"""
+        """Exécute réellement la logique de filtrage"""
         if getattr(self, '_silence_filter', False):
             return
 
-        lettre_saisie = self.ids.barre_recherche.text.lower()
-        categorie_filtre = self.ids.menu_categories.text
-        mois_filtre = self.ids.menu_mois.text
+        lettre_saisie = self.ids.barre_recherche.text.lower() if 'barre_recherche' in self.ids else ""
+        categorie_filtre = self.ids.menu_categories.text if 'menu_categories' in self.ids else "Toutes"
+        mois_filtre = self.ids.menu_mois.text if 'menu_mois' in self.ids else "Tous"
 
         resultat_filtre = {}
         for id_transac, info_transac in self.repertoire_transactions.items():
@@ -401,12 +415,6 @@ class TransacScreen(MDScreen):
         self.filtrer_transaction()
         self.menu.dismiss()
 
-    # RÉINITIALISER LES FILTRES ( barre de recherche, categories, mois)
-    def reinitialiser_filtres(self):
-        self.ids.barre_recherche.text=''
-        self.ids.menu_categories.text='Toutes'
-        self.ids.menu_mois.text='Tous'
-        self.afficher_transactions(self.repertoire_transactions)
     
     def recharger_transactions(self, event_data=None, *args):
         """Recharge les transactions. Si event_data contient une transaction, on l'ajoute chirurgicalement."""
@@ -463,13 +471,13 @@ class TransacScreen(MDScreen):
             
             self.afficher_transactions(self.repertoire_transactions)
             
-            if hasattr(self.ids, 'barre_recherche') and not self.ids.barre_recherche.focus:
-                if self.ids.barre_recherche.text != '':
-                    self._silence_filter = True
+            # --- Sécurité : Accès aux IDS ---
+            if hasattr(self, 'ids') and 'barre_recherche' in self.ids:
+                # Si l'utilisateur n'est pas en train de chercher, on nettoie
+                if not self.ids.barre_recherche.focus and self.ids.barre_recherche.text != '':
                     self.ids.barre_recherche.text = ''
                     self.ids.menu_categories.text = 'Toutes'
                     self.ids.menu_mois.text = 'Tous'
-                    Clock.schedule_once(lambda dt: setattr(self, '_silence_filter', False), 0.1)
         except Exception as e:
             print(f"DEBUG TransacScreen Error: {e}")
         finally:
