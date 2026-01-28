@@ -17,7 +17,9 @@ class VoiceSummary:
         self.engine = None
         self.is_speaking = False
         self.current_dialog = None
+        print("DEBUG: Initialisation de VoiceSummary")
         self._init_engine()
+        print(f"DEBUG: VoiceSummary initialisé, engine={self.engine is not None}")
     
     def _init_engine(self):
         """Initialise le moteur de synthèse vocale"""
@@ -128,7 +130,7 @@ Merci d'avoir consulté votre résumé budgétaire.
         
         # Titre avec icône
         title_label = MDLabel(
-            text="🎤 Résumé Vocal du Budget",
+            text="Résumé Vocal du Budget",
             font_style="H6",
             theme_text_color="Primary",
             bold=True,
@@ -236,38 +238,57 @@ Merci d'avoir consulté votre résumé budgétaire.
     
     def speak_summary(self, text):
         """Lit le résumé à voix haute"""
+        print(f"DEBUG: speak_summary appelé, is_speaking={self.is_speaking}")
         if not self.engine:
             self._show_error("Moteur vocal non disponible")
             return
         
         if self.is_speaking:
+            print("DEBUG: Arrêt de la lecture en cours avant de commencer")
             self.stop_speaking()
+            # Attendre un court instant pour que l'arrêt soit effectif
+            import time
+            time.sleep(0.05)  # Très court pour éviter le blocage
         
         def speak_in_thread():
             try:
+                print("DEBUG: Début de la lecture dans le thread")
                 self.is_speaking = True
                 self.engine.say(text)
                 self.engine.runAndWait()
                 self.is_speaking = False
+                print("DEBUG: Lecture terminée avec succès")
             except Exception as e:
                 self.is_speaking = False
-                print(f"Erreur lors de la lecture: {e}")
+                print(f"DEBUG: Erreur lors de la lecture: {e}")
         
         # Lancer dans un thread séparé pour ne pas bloquer l'UI
         thread = threading.Thread(target=speak_in_thread, daemon=True)
         thread.start()
+        print("DEBUG: Thread de lecture démarré")
     
     def stop_speaking(self):
         """Arrête la lecture en cours"""
-        if self.engine and self.is_speaking:
-            try:
-                self.engine.stop()
-                self.is_speaking = False
-                print("DEBUG: Lecture arrêtée avec succès")
-            except Exception as e:
-                print(f"DEBUG: Erreur lors de l'arrêt: {e}")
-        else:
-            print("DEBUG: Aucune lecture en cours à arrêter")
+        print(f"DEBUG: stop_speaking appelé, engine={self.engine is not None}, is_speaking={self.is_speaking}")
+        
+        if self.engine is None:
+            print("DEBUG: Moteur vocal non initialisé")
+            return
+            
+        try:
+            # Forcer l'arrêt de toutes les lectures en cours
+            self.engine.stop()
+            self.is_speaking = False
+            print("DEBUG: Commande stop envoyée au moteur vocal")
+            
+            # Pas de time.sleep() pour ne pas bloquer l'interface
+            # La méthode stop() de pyttsx3 est synchrone et rapide
+            
+            print("DEBUG: Lecture arrêtée avec succès")
+            
+        except Exception as e:
+            print(f"DEBUG: Erreur lors de l'arrêt: {e}")
+            self.is_speaking = False
     
     def close_dialog(self, on_close=None):
         """Ferme le popup"""
