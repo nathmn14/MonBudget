@@ -19,12 +19,10 @@ from controllers.dashboard import DashboardScreen
 from controllers.parametre import ParametreScreen
 
 
-# Import de la base de donnees
-
-from data.initialiser_bdd import init_database
-from data.connexion_bdd import init_default_user_and_account
-from models.categorie import CategorieModel
-from models.parametre import ParametreModel
+# Database handlers (Now handled in Splash)
+# from data.initialiser_bdd import init_database
+# from data.connexion_bdd import init_default_user_and_account
+# from models.categorie import CategorieModel
 
 
 #--- CONFIGUER LA TAILLE DE L'ÉCRAN (MOBILE)---
@@ -93,12 +91,6 @@ class MainApp(MDApp):
 
 
 if __name__ == "__main__":
-    # Initialisation rapide avant lancement
-    try:
-        init_database()
-        init_default_user_and_account()
-        CategorieModel.init_default_categories()
-    except Exception as e:
-        print(f"Init error: {e}")
-
+    # Lancement immédiat de l'app. 
+    # L'initialisation se fera sur la page de Splash pour éviter le freeze au démarrage.
     MainApp().run()
