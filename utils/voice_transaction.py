@@ -449,9 +449,25 @@ class VoiceTransaction:
                     return cat
 
         import random
-        # Palette de couleurs vives
-        colors = ["0.9,0.3,0.3,1", "0.3,0.9,0.3,1", "0.3,0.3,0.9,1", "0.9,0.9,0.3,1", "0.9,0.3,0.9,1", "0.3,0.9,0.9,1"]
+        # Palette étendue de couleurs vives et distinctes
+        palette = [
+            "0.18,0.8,0.44,1", "0.2,0.6,0.86,1", "0.9,0.5,0.13,1", "0.6,0.3,0.7,1",
+            "0.1,0.7,0.7,1", "0.9,0.3,0.23,1", "0.44,0.26,0.13,1", "0.95,0.2,0.4,1",
+            "0.1,0.3,0.5,1", "1,0.8,0.2,1", "0.5,0.4,0.3,1", "0.29,0.3,0.4,1",
+            "0.8,0.1,0.5,1", "0.1,0.8,0.8,1", "0.5,0.8,0.1,1", "0.8,0.5,0.1,1"
+        ]
         
+        # Récupérer les couleurs déjà utilisées pour éviter les répétitions
+        used_colors = [c['couleur'] for c in all_cats]
+        available_colors = [col for col in palette if col not in used_colors]
+        
+        # Si toutes les couleurs de la palette sont utilisées, on prend une couleur au hasard ou on génère
+        if available_colors:
+            color_to_use = random.choice(available_colors)
+        else:
+            # Fallback : couleur aléatoire mais différente (ou juste random choice si vraiment saturé)
+            color_to_use = f"{random.random():.2f},{random.random():.2f},{random.random():.2f},1"
+
         icon = "tag"
         lname = cat_name.lower()
         if any(x in lname for x in ["resto", "manger", "food", "repas"]): icon = "food"
@@ -464,7 +480,7 @@ class VoiceTransaction:
             nom=cat_name,
             type_transaction=type_transac,
             icone=icon,
-            couleur=random.choice(colors)
+            couleur=color_to_use
         )
         
         all_cats = CategorieModel.get_all()
