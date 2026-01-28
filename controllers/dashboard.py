@@ -9,6 +9,7 @@ from kivy.factory import Factory
 from kivy.graphics import Color, Ellipse, Rectangle, Line
 from kivy.metrics import dp
 from utils.event_bus import event_bus, EventTypes, subscribe_to_data_changes
+from utils.voice_transaction import VoiceTransaction
 
 class StatCard(MDBoxLayout):
     titre = StringProperty("")
@@ -170,10 +171,20 @@ class DashboardScreen(MDBoxLayout):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        print("DEBUG: Initialisation de DashboardScreen")
+        try:
+            self.voice_transaction = VoiceTransaction()  # Initialiser la transaction vocale
+            print("DEBUG: VoiceTransaction initialisé avec succès")
+        except Exception as e:
+            print(f"DEBUG: Erreur initialisation VoiceTransaction: {e}")
+            import traceback
+            traceback.print_exc()
+            self.voice_transaction = None
         # Charger les données après l'initialisation
         Clock.schedule_once(self.charger_donnees, 0.5)
         # S'abonner aux événements de changement de données
         self._setup_event_listeners()
+        print("DEBUG: DashboardScreen initialisé complètement")
 
     def _setup_event_listeners(self):
         """Configure les écouteurs d'événements pour le rafraîchissement automatique"""
@@ -292,3 +303,38 @@ class DashboardScreen(MDBoxLayout):
         # Mettre à jour le graphique
         if hasattr(self.ids, 'chart_pie'):
             self.ids.chart_pie.data = chart_data
+    
+    def ajouter_transaction_vocale(self):
+        """Ouvre l'interface pour ajouter une transaction vocale"""
+        print("DEBUG: Bouton micro cliqué - ajouter_transaction_vocale appelé")
+        
+        # Vérifier si VoiceTransaction est disponible
+        if not hasattr(self, 'voice_transaction') or self.voice_transaction is None:
+            print("DEBUG: VoiceTransaction non initialisé")
+            from kivymd.app import MDApp
+            app = MDApp.get_running_app()
+            if hasattr(app.root, 'notifier'):
+                app.root.notifier("Le système de transaction n'est pas disponible", "error")
+            return
+        
+        try:
+            print("DEBUG: Création du popup de transaction vocale")
+            dialog = self.voice_transaction.create_transaction_popup(
+                on_close=self._on_transaction_vocale_closed
+            )
+            print("DEBUG: Ouverture du dialog")
+            dialog.open()
+            print("DEBUG: Dialog ouvert avec succès")
+        except Exception as e:
+            print(f"DEBUG: Erreur dans ajouter_transaction_vocale: {e}")
+            import traceback
+            traceback.print_exc()
+            from kivymd.app import MDApp
+            app = MDApp.get_running_app()
+            if hasattr(app.root, 'notifier'):
+                app.root.notifier(f"Erreur lors de l'ouverture de l'interface vocale: {e}", "error")
+    
+    def _on_transaction_vocale_closed(self):
+        """Callback appelé à la fermeture de l'interface de transaction vocale"""
+        # Rafraîchir les données du dashboard après une transaction
+        Clock.schedule_once(lambda dt: self.charger_donnees(), 0.5)
