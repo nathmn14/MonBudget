@@ -1,5 +1,4 @@
-# Utilitaires pour la synthèse vocale
-import pyttsx3
+from utils.voice_engine import voice_engine
 import threading
 from kivy.clock import Clock
 from kivymd.uix.boxlayout import MDBoxLayout
@@ -22,34 +21,8 @@ class VoiceSummary:
         print(f"DEBUG: VoiceSummary initialisé, engine={self.engine is not None}")
     
     def _init_engine(self):
-        """Initialise le moteur de synthèse vocale"""
-        try:
-            self.engine = pyttsx3.init()
-            # Configuration pour une belle voix en français
-            voices = self.engine.getProperty('voices')
-            
-            # Choisir une voix française si disponible
-            french_voice_found = False
-            for voice in voices:
-                if 'french' in voice.name.lower() or 'français' in voice.name.lower() or 'fr' in voice.id.lower():
-                    self.engine.setProperty('voice', voice.id)
-                    french_voice_found = True
-                    break
-            
-            # Si pas de voix française, utiliser la première voix féminine disponible
-            if not french_voice_found:
-                for voice in voices:
-                    if 'female' in voice.name.lower() or 'femme' in voice.name.lower():
-                        self.engine.setProperty('voice', voice.id)
-                        break
-            
-            # Ajuster la vitesse et le volume pour une écoute agréable en français
-            self.engine.setProperty('rate', 140)  # Vitesse modérée pour le français
-            self.engine.setProperty('volume', 0.9)  # Volume élevé mais pas maximum
-            
-        except Exception as e:
-            print(f"Erreur d'initialisation de la synthèse vocale: {e}")
-            self.engine = None
+        """Initialisé via VoiceEngine"""
+        pass
     
     def generate_budget_summary(self, budget_data):
         """Génère le texte du résumé budgétaire en français CDF"""
@@ -237,58 +210,12 @@ Merci d'avoir consulté votre résumé budgétaire.
         return self.current_dialog
     
     def speak_summary(self, text):
-        """Lit le résumé à voix haute"""
-        print(f"DEBUG: speak_summary appelé, is_speaking={self.is_speaking}")
-        if not self.engine:
-            self._show_error("Moteur vocal non disponible")
-            return
-        
-        if self.is_speaking:
-            print("DEBUG: Arrêt de la lecture en cours avant de commencer")
-            self.stop_speaking()
-            # Attendre un court instant pour que l'arrêt soit effectif
-            import time
-            time.sleep(0.05)  # Très court pour éviter le blocage
-        
-        def speak_in_thread():
-            try:
-                print("DEBUG: Début de la lecture dans le thread")
-                self.is_speaking = True
-                self.engine.say(text)
-                self.engine.runAndWait()
-                self.is_speaking = False
-                print("DEBUG: Lecture terminée avec succès")
-            except Exception as e:
-                self.is_speaking = False
-                print(f"DEBUG: Erreur lors de la lecture: {e}")
-        
-        # Lancer dans un thread séparé pour ne pas bloquer l'UI
-        thread = threading.Thread(target=speak_in_thread, daemon=True)
-        thread.start()
-        print("DEBUG: Thread de lecture démarré")
+        """Lit le résumé à voix haute via VoiceEngine"""
+        voice_engine.speak(text)
     
     def stop_speaking(self):
-        """Arrête la lecture en cours"""
-        print(f"DEBUG: stop_speaking appelé, engine={self.engine is not None}, is_speaking={self.is_speaking}")
-        
-        if self.engine is None:
-            print("DEBUG: Moteur vocal non initialisé")
-            return
-            
-        try:
-            # Forcer l'arrêt de toutes les lectures en cours
-            self.engine.stop()
-            self.is_speaking = False
-            print("DEBUG: Commande stop envoyée au moteur vocal")
-            
-            # Pas de time.sleep() pour ne pas bloquer l'interface
-            # La méthode stop() de pyttsx3 est synchrone et rapide
-            
-            print("DEBUG: Lecture arrêtée avec succès")
-            
-        except Exception as e:
-            print(f"DEBUG: Erreur lors de l'arrêt: {e}")
-            self.is_speaking = False
+        """L'arrêt n'est pas encore implémenté uniformément dans Plyer, mais on peut stopper les animations si besoin."""
+        pass
     
     def close_dialog(self, on_close=None):
         """Ferme le popup"""

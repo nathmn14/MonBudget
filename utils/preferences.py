@@ -12,7 +12,13 @@ class PreferencesManager:
     """Gestionnaire des préférences de l'application"""
     
     def __init__(self):
-        self.preferences_file = Path("preferences.json")
+        from kivy.utils import platform
+        if platform == 'android':
+            from kivy.app import App
+            data_dir = App.get_running_app().user_data_dir if App.get_running_app() else os.getcwd()
+            self.preferences_file = Path(data_dir) / "preferences.json"
+        else:
+            self.preferences_file = Path("preferences.json")
         self.preferences = self._load_preferences()
     
     def _load_preferences(self):

@@ -1,8 +1,24 @@
-# Ce fichier sert uniquement a la connexion a la base de donnees qui est une bdd sqlite
-
+import os
+from kivy.utils import platform
 import sqlite3
 
-DB_NAME = "data/monbudget.db" # defini le nom et l'emplacement de la base de donnees
+# Définir l'emplacement de la base de données selon la plateforme
+if platform == 'android':
+    from android.storage import app_storage_path
+    # Sur Android, on utilise le dossier de données de l'application
+    DEFAULT_DB_PATH = os.path.join(os.environ.get('PYTHON_SERVICE_ARGUMENT', ''), 'data')
+    # Alternative plus robuste pour Kivy:
+    from kivy.app import App
+    # Note: On calculera le chemin final dynamiquement si besoin, ou on utilise un chemin relatif 
+    # qui sera géré par buildozer (source.dir).
+    # Pour faire simple et robuste sur Android :
+    db_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
+    if not os.path.exists(db_dir):
+        os.makedirs(db_dir, exist_ok=True)
+    DB_NAME = os.path.join(db_dir, "monbudget.db")
+else:
+    # Desktop
+    DB_NAME = "data/monbudget.db"
 
 def get_connection():
     """

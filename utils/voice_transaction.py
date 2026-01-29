@@ -1,8 +1,7 @@
 
-# Utilitaires pour les transactions vocales (compatible Python 3.13 via PowerShell)
+# Utilitaires pour les transactions vocales (Cross-plateforme: Windows, Linux, Android)
 import threading
 import re
-import subprocess
 import os
 from kivy.clock import Clock
 from kivy.lang import Builder
@@ -22,13 +21,8 @@ from models.categorie import CategorieModel
 from data.connexion_bdd import get_default_account_id
 from utils.event_bus import notify_transaction_added
 
-# Synthèse vocale
-try:
-    import pyttsx3
-    HAS_PYTTSX3 = True
-except ImportError:
-    HAS_PYTTSX3 = False
-    print("WARNING: pyttsx3 non installé.")
+# Moteur vocal universel
+from utils.voice_engine import voice_engine
 
 class VoiceTransaction:
     """Gestionnaire de transactions vocales avec interface moderne"""
@@ -40,20 +34,8 @@ class VoiceTransaction:
         self._init_tts_engine()
         
     def _init_tts_engine(self):
-        """Initialise le moteur de synthèse vocale uniquement"""
-        if HAS_PYTTSX3:
-            try:
-                self.engine = pyttsx3.init()
-                # Config voix
-                voices = self.engine.getProperty('voices')
-                for voice in voices:
-                    if 'fr' in voice.id.lower() or 'french' in voice.name.lower():
-                        self.engine.setProperty('voice', voice.id)
-                        break
-                self.engine.setProperty('rate', 150)
-                self.engine.setProperty('volume', 0.9)
-            except Exception as e:
-                print(f"Erreur init pyttsx3: {e}")
+        """Initialisé via VoiceEngine maintenant"""
+        pass
     
     def create_transaction_popup(self, on_close=None):
         """Crée l'interface utilisateur style Google Assistant"""
@@ -151,78 +133,37 @@ class VoiceTransaction:
             self.start_listening()
 
     def start_listening(self):
-        """Lance le thread d'écoute PoweShell pour compatibilité Windows/Python 3.13"""
+        """Lance l'écoute via VoiceEngine (Cross-plateforme)"""
+        if self.is_listening:
+            return
+            
         self.is_listening = True
         self.update_ui_state("listening")
         
-        threading.Thread(target=self._listen_thread_powershell, daemon=True).start()
+        # On passe les callbacks à l'engine
+        voice_engine.listen(
+            on_result=self._on_speech_success,
+            on_error=self._on_speech_error
+        )
+
+    def _on_speech_success(self, text):
+        """Callback quand l'engine a compris du texte"""
+        self.is_listening = False
+        Clock.schedule_once(lambda dt: self.update_ui_state("processing"))
+        # Traitement différé pour laisser l'UI souffler
+        Clock.schedule_once(lambda dt: self.process_command(text), 0.5)
+
+    def _on_speech_error(self, error_msg):
+        """Callback en cas d'erreur ou non compréhension"""
+        self.is_listening = False
+        Clock.schedule_once(lambda dt: self.update_ui_state("error", error_msg))
 
     def stop_listening(self):
-        """Arrête l'écoute (ne peut pas vraiment arrêter le subprocess mais reset l'UI)"""
+        """Arrête l'écoute (le feedback visuel)"""
         self.is_listening = False
         self.update_ui_state("idle")
 
-    def _listen_thread_powershell(self):
-        """Exécute le script PowerShell de reconnaissance vocale"""
-        try:
-            Clock.schedule_once(lambda dt: self.update_ui_state("listening_active"))
-            
-            script_path = os.path.join(os.getcwd(), 'utils', 'speech_recognizer.ps1')
-            
-            # Appel PowerShell
-            cmd = ["powershell", "-ExecutionPolicy", "Bypass", "-File", script_path]
-            
-            # Masquer la fenêtre console si possible
-            startupinfo = None
-            if os.name == 'nt':
-                startupinfo = subprocess.STARTUPINFO()
-                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-            
-            process = subprocess.Popen(
-                cmd, 
-                stdout=subprocess.PIPE, 
-                stderr=subprocess.PIPE,
-                startupinfo=startupinfo,
-                encoding='utf-8', # Force UTF-8 decoding
-                errors='replace'
-            )
-            
-            stdout, stderr = process.communicate()
-            
-            # Traitement
-            Clock.schedule_once(lambda dt: self.update_ui_state("processing"))
-            
-            if stdout:
-                print(f"DEBUG PS OUT: {stdout}")
-                lines = stdout.strip().split('\n')
-                result_line = lines[-1].strip() # Prendre la dernière ligne
-                
-                if result_line.startswith("SUCCESS:"):
-                    text = result_line.replace("SUCCESS:", "").strip()
-                    self.process_command(text)
-                elif "TIMEOUT" in result_line:
-                    Clock.schedule_once(lambda dt: self.update_ui_state("error", "Je n'ai rien entendu."))
-                elif "ERROR" in result_line:
-                    Clock.schedule_once(lambda dt: self.update_ui_state("error", "Erreur système vocal."))
-                else:
-                    # Parfois des logs parasites, on essaie de trouver SUCCESS n'importe où
-                    found = False
-                    for line in lines:
-                        if line.strip().startswith("SUCCESS:"):
-                            text = line.strip().replace("SUCCESS:", "").strip()
-                            self.process_command(text)
-                            found = True
-                            break
-                    if not found:
-                         Clock.schedule_once(lambda dt: self.update_ui_state("error", "Aucun résultat."))
-            else:
-                 Clock.schedule_once(lambda dt: self.update_ui_state("error", "Erreur script vocal."))
-
-        except Exception as e:
-            print(f"DEBUG: Erreur thread vocal : {e}")
-            Clock.schedule_once(lambda dt: self.update_ui_state("error", f"Erreur: {str(e)}"))
-        finally:
-            self.is_listening = False
+    # _listen_thread_powershell a été supprimé car remplacé par VoiceEngine logic
 
     def process_command(self, text):
         """Analyse la commande vocale et extrait les infos"""
@@ -408,14 +349,9 @@ class VoiceTransaction:
              self.anim = None
 
     def speak(self, text):
-        if self.engine:
-            threading.Thread(target=lambda: self._speak_thread(text), daemon=True).start()
+        voice_engine.speak(text)
 
-    def _speak_thread(self, text):
-        try:
-            self.engine.say(text)
-            self.engine.runAndWait()
-        except: pass
+    # _speak_thread n'est plus nécessaire car géré par VoiceEngine
 
     def close_dialog(self, on_close=None):
         if self.current_dialog:

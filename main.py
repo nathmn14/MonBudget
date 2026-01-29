@@ -3,6 +3,7 @@ from kivymd.app import MDApp
 from kivy.lang import Builder
 from kivy.core.window import Window
 from kivymd.uix.screenmanager import MDScreenManager
+from kivy.utils import platform
 
 # Import du gestionnaire de préférences
 from utils.preferences import preferences_manager
@@ -35,6 +36,29 @@ class WindowManager(MDScreenManager):
 
 
 class MainApp(MDApp):
+    def on_start(self):
+        """Initialisation au démarrage"""
+        if platform == 'android':
+            try:
+                from android import activity
+                activity.bind(on_activity_result=self.on_activity_result)
+            except Exception as e:
+                print(f"Android activity bind error: {e}")
+
+    def on_activity_result(self, request_code, result_code, data):
+        """Gère le retour des activités Android (pour la voix)"""
+        if request_code == 7001:  # Notre code pour la reconnaissance vocale
+            from jnius import autoclass
+            Activity = autoclass('android.app.Activity')
+            if result_code == Activity.RESULT_OK:
+                results = data.getStringArrayListExtra("android.speech.extra.RESULTS")
+                if results and results.size() > 0:
+                    recognized_text = results.get(0)
+                    # On envoie le résultat à l'engine ou directement à l'écran actif
+                    from utils.voice_engine import voice_engine
+                    if hasattr(voice_engine, 'handle_android_result'):
+                        voice_engine.handle_android_result(recognized_text)
+
     def build(self):
         # 1. Configurer le thème depuis les préférences sauvegardées
         saved_theme = preferences_manager.get_theme()
