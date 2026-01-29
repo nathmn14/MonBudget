@@ -62,25 +62,60 @@
 
     # Zone des axes et des barres (dessinée dynamiquement en Python)
     MDBoxLayout:
-        id: chart_area
+        orientation: 'horizontal'
         size_hint_y: 0.8
+        
+        # Zone de graduation
+        MDBoxLayout:
+            id: graduation_area
+            orientation: 'vertical'
+            size_hint_x: None
+            width: dp(45)
+            padding: [0, dp(20), dp(5), dp(20)] # Align with chart and add gap
+            MDLabel:
+                id: grad_3
+                text: ""
+                font_style: "Caption"
+                halign: "right"
+            MDLabel:
+                id: grad_2
+                text: ""
+                font_style: "Caption"
+                halign: "right"
+            MDLabel:
+                id: grad_1
+                text: ""
+                font_style: "Caption"
+                halign: "right"
+            MDLabel:
+                id: grad_0
+                text: ""
+                font_style: "Caption"
+                halign: "right"
+
+        MDBoxLayout:
+            id: chart_area
+            size_hint_x: 1
 
     # Étiquettes des mois (alimentées dynamiquement)
     MDBoxLayout:
         size_hint_y: 0.1
-        padding: [dp(40), 0, 0, 0]
+        padding: [dp(45), 0, 0, 0]
         MDLabel:
             id: month_lbl_0
             text: ""
             font_style: "Caption"
+            halign: "center"
         MDLabel:
             id: month_lbl_1
             text: ""
             font_style: "Caption"
+            halign: "center"
         MDLabel:
             id: month_lbl_2
             text: ""
             font_style: "Caption"
+            halign: "center"
 
     # Légende (Revenus / Dépenses)
     MDBoxLayout:

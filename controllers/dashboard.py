@@ -55,9 +55,21 @@ class GraphiqueBarres(MDBoxLayout):
 
         max_val = max(max(d.get("revenu", 0), d.get("depense", 0)) for d in self.data)
         if max_val <= 0:
-            max_val = 1
+            max_val = 1000
 
-        chart_left = area.x + dp(30)
+        # Mise à jour des étiquettes de graduation
+        for i in range(4):
+            lbl = self.ids.get(f"grad_{i}")
+            if lbl:
+                val = (max_val / 3) * i
+                if val >= 1000000:
+                    lbl.text = f"{val/1000000:.1f}M"
+                elif val >= 1000:
+                    lbl.text = f"{int(val/1000)}k"
+                else:
+                    lbl.text = f"{int(val)}"
+
+        chart_left = area.x + dp(5)
         chart_right = area.right - dp(10)
         chart_bottom = area.y + dp(20)
         chart_top = area.top - dp(20)
@@ -66,10 +78,10 @@ class GraphiqueBarres(MDBoxLayout):
         chart_w = max(chart_right - chart_left, 1)
 
         with area.canvas.before:
-            Color(0.9, 0.9, 0.9, 1)
-            Line(points=[chart_left, area.y + dp(20), chart_right, area.y + dp(20)])
-            Line(points=[chart_left, area.y + dp(70), chart_right, area.y + dp(70)])
-            Line(points=[chart_left, area.y + dp(120), chart_right, area.y + dp(120)])
+            Color(0.8, 0.8, 0.8, 0.5)
+            for i in range(4):
+                y_line = chart_bottom + (i / 3) * chart_h
+                Line(points=[chart_left, y_line, chart_right, y_line], width=1)
 
             n = len(self.data)
             group_w = chart_w / max(n, 1)
