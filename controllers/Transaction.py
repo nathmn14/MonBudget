@@ -288,8 +288,9 @@ class TransacScreen(MDScreen):
             self.ids.nb_transaction.text = f"Nous avons trouvé {n} transaction{'s' if n > 1 else ''}"
         
         rv_data = []
-        # On trie pour avoir les plus récentes en haut (basé sur la clé du dict si numérique)
-        keys = sorted(repertoire.keys(), reverse=True)
+        # On trie pour avoir les plus récentes en haut (basé sur l'ordre d'insertion/BDD)
+        # Si le répertoire est déjà dans l'ordre de la BDD (desc), on garde cet ordre
+        keys = sorted(repertoire.keys())
         
         for k in keys:
             info = repertoire[k]

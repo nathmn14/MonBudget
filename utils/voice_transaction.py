@@ -143,7 +143,8 @@ class VoiceTransaction:
         # On passe les callbacks à l'engine
         voice_engine.listen(
             on_result=self._on_speech_success,
-            on_error=self._on_speech_error
+            on_error=self._on_speech_error,
+            on_status=self.update_ui_state
         )
 
     def _on_speech_success(self, text):
@@ -199,15 +200,32 @@ class VoiceTransaction:
             type_transac = "ENTREE"
 
         # 3. Extraction de la Catégorie
-        clean_text = text.replace(montant_match.group(0), '')
-        stopwords = ["ajouter", "dépense", "depense", "revenu", "pour", "de", "dans", "le", "la", "un", "une", "euros", "fc", "dollars", "francs"]
+        # On définit les mots à ignorer (monnaies, verbes, articles)
+        monnaies = ["euros", "fc", "dollars", "francs", "congolais", "franc", "dollar", "euro"]
+        stopwords = ["ajouter", "dépense", "depense", "revenu", "pour", "de", "dans", "le", "la", "un", "une", "argent", "budget"] + monnaies
         
-        tokens = clean_text.split()
-        categorie_mots = [word for word in tokens if word not in stopwords and len(word) > 2]
-        
+        # On récupère toutes les catégories existantes pour tenter un match exact/partiel
+        all_categories = CategorieModel.get_all()
         categorie_nom = "Divers"
-        if categorie_mots:
-            categorie_nom = " ".join(categorie_mots).capitalize()
+        
+        # Tentative 1 : Chercher si un nom de catégorie existante est présent dans le texte
+        text_sans_montant = text.replace(montant_match.group(0), ' ')
+        for cat in all_categories:
+            nom_cat = cat['nom_categorie'].lower()
+            if nom_cat in text_sans_montant and len(nom_cat) > 2:
+                categorie_nom = cat['nom_categorie']
+                break
+        else:
+            # Tentative 2 : Extraction par mots-clés si aucune catégorie connue n'est trouvée
+            # On nettoie les monnaies spécifiquement pour éviter les résidus (ex: 5000fc)
+            clean_text = re.sub(r'|'.join([rf'\b{m}\b' for m in monnaies]), '', text_sans_montant)
+            
+            tokens = clean_text.split()
+            categorie_mots = [word for word in tokens if word not in stopwords and len(word) >= 2]
+            
+            if categorie_mots:
+                # On prend la première suite de mots après le montant ou la plus pertinente
+                categorie_nom = " ".join(categorie_mots).capitalize()
             
         id_compte = get_default_account_id()
         categorie_finale = self._get_or_create_category(categorie_nom, id_compte)
@@ -223,9 +241,8 @@ class VoiceTransaction:
         """Sauvegarde en BDD"""
         id_compte = get_default_account_id()
         try:
-            # Capitalisation propre
-            desc = description_vocale.strip()
-            if desc: desc = desc[0].upper() + desc[1:]
+            # On utilise le nom de la catégorie comme description (Note)
+            desc = categorie['nom_categorie']
             
             TransactionModel.create(
                 id_compte=id_compte,
@@ -236,7 +253,7 @@ class VoiceTransaction:
                 date_transaction=None
             )
             
-            msg = f"{'Revenu' if type_transac == 'ENTREE' else 'Dépense'} de {montant}."
+            msg = f"{'Ajouté' if type_transac == 'ENTREE' else 'Dépensé'} : {montant} FC\nCatégorie : {categorie['nom_categorie']}"
             Clock.schedule_once(lambda dt: self.update_ui_state("success", msg))
             
             notify_transaction_added({
@@ -246,7 +263,7 @@ class VoiceTransaction:
                 'categorie': categorie['nom_categorie']
             })
             
-            self.speak(f"Compris. {msg}")
+            self.speak(f"Compris. {montant} francs pour {categorie['nom_categorie']}.")
             Clock.schedule_once(lambda dt: self.close_dialog(), 2.5)
             
         except Exception as e:
@@ -255,7 +272,8 @@ class VoiceTransaction:
 
     def _get_or_create_category(self, cat_name, id_compte):
         """Logique catégorie"""
-        all_cats = CategorieModel.get_all(id_compte)
+        # Note: Dans votre modèle actuel, get_all() ne prend pas d'arguments (id_compte)
+        all_cats = CategorieModel.get_all()
         
         for cat in all_cats:
             if cat['nom_categorie'].lower() == cat_name.lower():
@@ -278,13 +296,13 @@ class VoiceTransaction:
         elif any(x in lname for x in ["jeu", "film", "ciné"]): icon = "gamepad-variant"
         
         CategorieModel.create(
-            nom_categorie=cat_name,
+            nom=cat_name, # Changé de nom_categorie à nom selon la signature de CategorieModel.create
+            type_transaction="SORTIE", # Ajouté argument obligatoire
             icone=icon,
-            couleur_icone=random.choice(colors),
-            id_compte=id_compte
+            couleur=random.choice(colors) # Changé couleur_icone à couleur
         )
         
-        all_cats = CategorieModel.get_all(id_compte)
+        all_cats = CategorieModel.get_all()
         for cat in all_cats:
             if cat['nom_categorie'] == cat_name:
                 return cat

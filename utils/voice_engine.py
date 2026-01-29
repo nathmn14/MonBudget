@@ -10,6 +10,13 @@ try:
 except Exception:
     HAS_PLYER_TTS = False
 
+# Fallback TTS for Desktop (pyttsx3)
+try:
+    import pyttsx3
+    HAS_PYTTSX3 = True
+except ImportError:
+    HAS_PYTTSX3 = False
+
 # Desktop STT
 try:
     import speech_recognition as sr
@@ -47,6 +54,7 @@ class VoiceEngine:
         self.recognizer = None
         self.on_result_callback = None
         self.on_error_callback = None
+        self.on_status_callback = None # Nouveau : pour notifier les changements d'état
         if HAS_SR:
             self.recognizer = sr.Recognizer()
             
@@ -65,16 +73,36 @@ class VoiceEngine:
         
         def _speak_task():
             try:
-                if HAS_PLYER_TTS:
+                # Try Plyer first (good for mobile)
+                if HAS_PLYER_TTS and platform == 'android':
+                    tts.speak(text)
+                # Fallback to pyttsx3 for Desktop (usually more reliable on Win/Linux)
+                elif HAS_PYTTSX3:
+                    engine = pyttsx3.init()
+                    
+                    # Tenter de trouver une voix française
+                    voices = engine.getProperty('voices')
+                    for voice in voices:
+                        if "fr" in voice.id.lower() or "french" in voice.name.lower():
+                            engine.setProperty('voice', voice.id)
+                            break
+                    
+                    engine.setProperty('rate', 150) # Vitesse ajustable
+                    engine.say(text)
+                    engine.runAndWait()
+                    # Indispensable sur certains systèmes pour libérer les ressources
+                    del engine
+                # Last resort: Plyer on desktop
+                elif HAS_PLYER_TTS:
                     tts.speak(text)
                 else:
-                    print("TTS failure: Plyer not available")
+                    print("TTS failure: No TTS engine available")
             except Exception as e:
                 print(f"TTS Error: {e}")
 
         threading.Thread(target=_speak_task, daemon=True).start()
 
-    def listen(self, on_result, on_error=None):
+    def listen(self, on_result, on_error=None, on_status=None):
         """Démarre l'écoute selon la plateforme"""
         if self.is_listening:
             return
@@ -82,6 +110,7 @@ class VoiceEngine:
         self.is_listening = True
         self.on_result_callback = on_result
         self.on_error_callback = on_error
+        self.on_status_callback = on_status
         
         if platform == 'android':
             self._listen_android(on_result, on_error)
@@ -102,14 +131,25 @@ class VoiceEngine:
 
         try:
             with sr.Microphone() as source:
+                # Étape 1 : Ajustement au bruit (On informe l'UI)
+                print("Ajustement au bruit...")
+                if self.on_status_callback:
+                    Clock.schedule_once(lambda dt: self.on_status_callback("listening"))
+                
+                self.recognizer.adjust_for_ambient_noise(source, duration=0.8)
+                
+                # Étape 2 : Écoute active
                 print("Listening (Desktop)...")
-                # Ajustement au bruit ambiant
-                self.recognizer.adjust_for_ambient_noise(source, duration=0.5)
+                if self.on_status_callback:
+                    Clock.schedule_once(lambda dt: self.on_status_callback("listening_active"))
+                
                 audio = self.recognizer.listen(source, timeout=8, phrase_time_limit=10)
                 
             print("Processing (Desktop)...")
-            # Utilisation de Google Web Speech API (Gratuit, nécessite internet)
-            # Pour l'offline, on pourrait utiliser sphinx mais c'est moins bon en français
+            if self.on_status_callback:
+                Clock.schedule_once(lambda dt: self.on_status_callback("processing"))
+                
+            # Utilisation de Google Web Speech API
             text = self.recognizer.recognize_google(audio, language="fr-FR")
             
             Clock.schedule_once(lambda dt: on_result(text))
@@ -119,10 +159,12 @@ class VoiceEngine:
                 Clock.schedule_once(lambda dt: on_error("Désolé, je n'ai pas compris l'audio."))
         except sr.RequestError as e:
             if on_error:
-                Clock.schedule_once(lambda dt: on_error(f"Erreur de service : {e}"))
+                error_msg = f"Erreur de service : {e}"
+                Clock.schedule_once(lambda dt: on_error(error_msg))
         except Exception as e:
             if on_error:
-                Clock.schedule_once(lambda dt: on_error(f"Erreur : {str(e)}"))
+                error_msg = f"Erreur : {str(e)}"
+                Clock.schedule_once(lambda dt: on_error(error_msg))
         finally:
             self.is_listening = False
 
