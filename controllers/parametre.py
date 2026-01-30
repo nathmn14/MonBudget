@@ -683,7 +683,8 @@ class ParametreScreen(MDBoxLayout):
             "Nathan Monga", 
             "Martha Kalemba",
             "Salem Ohelo",
-            "Timothée Mukash"
+            "Timothée Mukash",
+            "Emmanuel Tshibwabwa"
         ]
         
         for dev in developpeurs:
